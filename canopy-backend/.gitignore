@@ -1,0 +1,59 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Application config (contains passwords)
+src/main/resources/application.yml
+
+# IDE files
+.idea/
+*.iml
+
+# System files
+.DS_Store
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# ─── Backend ───────────────────────────
+canopy-backend/target/
+canopy-backend/src/main/resources/application.yml
+canopy-backend/.idea/
+canopy-backend/*.iml
+canopy-backend/.mvn/
+
+# ─── Frontend (for later) ───────────────
+canopy-frontend/.next/
+canopy-frontend/node_modules/
+canopy-frontend/.env.local
+
+# ─── System ─────────────────────────────
+.DS_Store
+Thumbs.db
