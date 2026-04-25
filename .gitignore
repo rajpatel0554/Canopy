@@ -1,0 +1,6 @@
+canopy-backend/target/
+canopy-backend/src/main/resources/application.yml
+canopy-backend/.idea/
+canopy-backend/*.iml
+.DS_Store
+Thumbs.db
