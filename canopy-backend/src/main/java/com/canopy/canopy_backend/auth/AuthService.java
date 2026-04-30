@@ -5,6 +5,7 @@ import com.canopy.canopy_backend.model.User;
 import com.canopy.canopy_backend.tenant.TenantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,7 +61,8 @@ public class AuthService implements UserDetailsService {
         userRepository.save(user);
 
         // 4. Generate JWT token and return response
-        String token = jwtUtil.generateToken(user.getEmail());
+        //String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getUsername(), request.getTenantSlug());
 
         return AuthResponse.builder()
                 .token(token)
@@ -74,19 +76,21 @@ public class AuthService implements UserDetailsService {
 
     public AuthResponse login(LoginRequest request) {
 
-        // 1. Find the user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException(
                         "Invalid email or password."
                 ));
 
-        // 2. Check the password against the stored hash
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid email or password.");
         }
 
-        // 3. Generate JWT token and return response
-        String token = jwtUtil.generateToken(user.getEmail());
+        Tenant tenant = tenantRepository.findById(user.getTenantId())  // ← fetch tenant
+                .orElseThrow(() -> new RuntimeException(
+                        "Tenant not found."
+                ));
+
+        String token = jwtUtil.generateToken(user.getEmail(), tenant.getSlug()); // ← pass slug
 
         return AuthResponse.builder()
                 .token(token)

@@ -1,5 +1,6 @@
 package com.canopy.canopy_backend.auth;
 
+import com.canopy.canopy_backend.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,51 +30,51 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // ── Step 1: Get the Authorization header ─────────────────
         final String authHeader = request.getHeader("Authorization");
 
-        // ── Step 2: If no token → skip, pass request along ───────
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ── Step 3: Extract the raw token ─────────────────────────
-        final String token = authHeader.substring(7); // strips "Bearer "
-
-        // ── Step 4: Extract email from token ──────────────────────
+        final String token = authHeader.substring(7);
         final String email = jwtUtil.extractEmail(token);
 
-        // ── Step 5: If email found and user not yet authenticated ──
-        if (email != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            if (email != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            // ── Step 6: Load full user from database ───────────────
-            UserDetails userDetails = authService.loadUserByUsername(email);
+                UserDetails userDetails = authService.loadUserByUsername(email);
 
-            // ── Step 7: Validate the token ─────────────────────────
-            if (jwtUtil.isTokenValid(token, userDetails)) {
+                if (jwtUtil.isTokenValid(token, userDetails)) {
 
-                // ── Step 8: Build authentication object ───────────
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                    // ── SET TENANT CONTEXT ────────────────────────
+                    String tenantSlug = jwtUtil.extractTenantSlug(token);
+                    String schemaName = "tenant_" + tenantSlug; // e.g. "tenant_acme-corp"
+                    TenantContext.setTenantSchema(schemaName);
+                    // ─────────────────────────────────────────────
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                // ── Step 9: Pin identity to the noticeboard ────────
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authToken);
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authToken);
+                }
             }
-        }
 
-        // ── Step 10: Always pass request to next filter/controller ─
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+
+        } finally {
+            TenantContext.clear();  // ← ALWAYS clears, even if an exception occurs
+        }
     }
 }

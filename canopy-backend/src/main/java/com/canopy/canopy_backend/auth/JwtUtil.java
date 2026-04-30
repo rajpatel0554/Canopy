@@ -23,9 +23,10 @@ public class JwtUtil {
 
     // ── 1. GENERATE ──────────────────────────────────────────────
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String tenantSlug) {  // ← added tenantSlug param
         return Jwts.builder()
                 .subject(email)
+                .claim("tenantSlug", tenantSlug)                    // ← embedded as a claim
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -36,6 +37,10 @@ public class JwtUtil {
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractTenantSlug(String token) {                 // ← NEW method
+        return extractClaim(token, claims -> claims.get("tenantSlug", String.class));
     }
 
     public Date extractExpiration(String token) {
