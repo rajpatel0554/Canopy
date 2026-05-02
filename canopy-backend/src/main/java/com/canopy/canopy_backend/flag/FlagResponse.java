@@ -20,6 +20,7 @@ public class FlagResponse {
     private String description;
     private VariationType variationType;
     private boolean enabled;
+    private int rolloutPercentage;
     private LocalDateTime createdAt;
 
     // ── Static factory — converts a Flag model into a FlagResponse DTO ──────
@@ -31,6 +32,7 @@ public class FlagResponse {
                 .description(flag.getDescription())
                 .variationType(flag.getVariationType())
                 .enabled(flag.isEnabled())
+                .rolloutPercentage(flag.getRolloutPercentage())
                 .createdAt(flag.getCreatedAt())
                 .build();
     }

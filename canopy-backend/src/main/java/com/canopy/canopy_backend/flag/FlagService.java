@@ -3,6 +3,7 @@ package com.canopy.canopy_backend.flag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class FlagService {
 
     private final FlagRepository flagRepository;
+    private final FlagVariationRepository variationRepository;
 
     // ── GET ALL ──────────────────────────────────────────────────────────────
 
@@ -48,10 +50,45 @@ public class FlagService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .variationType(request.getVariationType())
-                .enabled(false)                          // ← always starts disabled
+                .enabled(false)                             // ← always starts disabled
+                .rolloutPercentage(request.getRolloutPercentage())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         flagRepository.save(flag);
+
+        // ── Save ON variation (is_default = false) ─────────────────────────
+        String onValue = switch (flag.getVariationType()) {
+            case BOOLEAN -> "true";
+            case STRING  -> "\"on\"";
+            case NUMBER  -> "1";
+            case JSON    -> "{}";
+        };
+
+        FlagVariation onVariation = FlagVariation.builder()
+                .variationId(UUID.randomUUID())
+                .flagId(flag.getFlagId())
+                .value(onValue)
+                .isDefault(false)
+                .build();
+
+        // ── Save OFF / default variation (is_default = true) ───────────────
+        String offValue = switch (flag.getVariationType()) {
+            case BOOLEAN -> "false";
+            case STRING  -> "\"off\"";
+            case NUMBER  -> "0";
+            case JSON    -> "{}";
+        };
+
+        FlagVariation offVariation = FlagVariation.builder()
+                .variationId(UUID.randomUUID())
+                .flagId(flag.getFlagId())
+                .value(offValue)
+                .isDefault(true)
+                .build();
+
+        variationRepository.save(onVariation);
+        variationRepository.save(offVariation);
 
         return FlagResponse.from(flag);
     }
@@ -72,6 +109,7 @@ public class FlagService {
                 .description(request.getDescription())
                 .variationType(existing.getVariationType())
                 .enabled(existing.isEnabled())
+                .rolloutPercentage(request.getRolloutPercentage())
                 .createdAt(existing.getCreatedAt())
                 .build();
 

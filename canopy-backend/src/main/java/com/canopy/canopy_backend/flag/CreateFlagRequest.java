@@ -22,4 +22,6 @@ public class CreateFlagRequest {
 
     @NotNull(message = "Variation type is required")
     private VariationType variationType;
+
+    private int rolloutPercentage = 0;  // optional — defaults to 0
 }

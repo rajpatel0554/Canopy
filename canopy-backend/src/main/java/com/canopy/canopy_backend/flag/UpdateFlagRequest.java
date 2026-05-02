@@ -10,4 +10,6 @@ public class UpdateFlagRequest {
     private String name;
 
     private String description;
+
+    private int rolloutPercentage;
 }

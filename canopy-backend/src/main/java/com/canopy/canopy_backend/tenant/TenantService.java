@@ -77,6 +77,7 @@ public class TenantService {
                     description     TEXT,
                     variation_type  VARCHAR(50) NOT NULL,
                     enabled         BOOLEAN NOT NULL DEFAULT false,
+                    rollout_percentage   INTEGER NOT NULL DEFAULT 0,
                     created_at      TIMESTAMP NOT NULL DEFAULT now()
                 )
                 """.formatted(schema),
@@ -114,7 +115,31 @@ public class TenantService {
                     variation_id    UUID REFERENCES "%s".flag_variations(variation_id),
                     priority        INTEGER NOT NULL DEFAULT 0
                 )
-                """.formatted(schema, schema, schema)
+                """.formatted(schema, schema, schema),
+
+                // ── Table 5: segment_rules (NEW) ────────────────────────────────
+                """
+                CREATE TABLE IF NOT EXISTS "%s".segment_rules (
+                    rule_id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    segment_id      UUID NOT NULL REFERENCES "%s".segments(segment_id)
+                                        ON DELETE CASCADE,
+                    attribute       VARCHAR(255) NOT NULL,
+                    operator        VARCHAR(50) NOT NULL,
+                    value           VARCHAR(255) NOT NULL
+                )
+                """.formatted(schema, schema),
+
+                // ── Table 6: flag_segments (NEW) ────────────────────────────────
+                """
+                CREATE TABLE IF NOT EXISTS "%s".flag_segments (
+                    flag_id         UUID NOT NULL REFERENCES "%s".flags(flag_id)
+                                        ON DELETE CASCADE,
+                    segment_id      UUID NOT NULL REFERENCES "%s".segments(segment_id)
+                                        ON DELETE CASCADE,
+                    variation_id    UUID REFERENCES "%s".flag_variations(variation_id),
+                    PRIMARY KEY (flag_id, segment_id)
+                )
+                """.formatted(schema, schema, schema, schema)
         );
 
         // Run each SQL statement one by one

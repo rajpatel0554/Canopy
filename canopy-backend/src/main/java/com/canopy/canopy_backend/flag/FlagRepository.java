@@ -26,6 +26,7 @@ public class FlagRepository {
             .description(rs.getString("description"))
             .variationType(VariationType.valueOf(rs.getString("variation_type")))
             .enabled(rs.getBoolean("enabled"))
+            .rolloutPercentage(rs.getInt("rollout_percentage"))
             .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
             .build();
 
@@ -56,12 +57,13 @@ public class FlagRepository {
     }
 
     public void save(Flag flag) {
+        String schema = TenantContext.getTenantSchema();
         String sql = """
-        INSERT INTO %s
-            (flag_id, "key", name, description, variation_type, enabled, created_at)
-        VALUES
-            (?, ?, ?, ?, ?, ?, NOW())
-        """.formatted(table());
+            INSERT INTO "%s".flags
+                (flag_id, "key", name, description,
+                 variation_type, enabled, rollout_percentage, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """.formatted(schema);
 
         jdbcTemplate.update(sql,
                 flag.getFlagId(),
@@ -69,20 +71,27 @@ public class FlagRepository {
                 flag.getName(),
                 flag.getDescription(),
                 flag.getVariationType().name(),
-                flag.isEnabled()
+                flag.isEnabled(),
+                flag.getRolloutPercentage(),
+                flag.getCreatedAt()
         );
     }
 
     public void update(Flag flag) {
+        String schema = TenantContext.getTenantSchema();
         String sql = """
-        UPDATE %s
-        SET name = ?, description = ?, enabled = ?
-        WHERE \"key\" = ?
-        """.formatted(table());
+            UPDATE "%s".flags
+            SET name               = ?,
+                description        = ?,
+                rollout_percentage = ?,
+                enabled            = ?
+            WHERE "key" = ?
+            """.formatted(schema);
 
         jdbcTemplate.update(sql,
                 flag.getName(),
                 flag.getDescription(),
+                flag.getRolloutPercentage(),
                 flag.isEnabled(),
                 flag.getKey()
         );

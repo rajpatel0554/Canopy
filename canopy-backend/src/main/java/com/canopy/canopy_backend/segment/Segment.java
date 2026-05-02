@@ -1,4 +1,4 @@
-package com.canopy.canopy_backend.flag;
+package com.canopy.canopy_backend.segment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,17 +13,13 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Flag {
+public class Segment {
 
-    private UUID flagId;
-    private String key;
+    private UUID segmentId;
     private String name;
     private String description;
-    private VariationType variationType;
-    private boolean enabled;
-    private int rolloutPercentage;
     private LocalDateTime createdAt;
 
-    // Loaded separately when needed (e.g. for evaluation)
-    private List<FlagVariation> variations;
+    // Populated when fetching a single segment — not stored in DB directly
+    private List<SegmentRule> rules;
 }
