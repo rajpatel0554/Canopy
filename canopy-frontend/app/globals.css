@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Canopy Sage & Linen Colors ────────────────── */
+  --color-forest:         #1c3a2f;
+  --color-mint:           #6ee7b7;
+  --color-linen:          #f7f7f2;
+  --color-card:           #ffffff;
+  --color-canopy-border:  #d1fae5;
+  --color-success:        #059669;
+  --color-danger:         #dc2626;
+  --color-warning:        #d97706;
+  --color-canopy-text:    #374151;
+  --color-muted:          #9ca3af;
+
+  /* ── Canopy Fonts ───────────────────────────────── */
+  --font-serif: var(--font-dm-serif), serif;
+  --font-sans:  var(--font-dm-sans), sans-serif;
+  --font-mono:  var(--font-jetbrains-mono), monospace;
+
+  /* ── Border Radius ──────────────────────────────── */
+  --radius: 0.5rem;
+}
+
+body {
+  background-color: var(--color-linen);
+  color: var(--color-canopy-text);
+  font-family: var(--font-sans);
+}
+
+.font-key {
+  font-family: var(--font-mono);
+}
