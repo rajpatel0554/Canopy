@@ -29,19 +29,18 @@ export default function Home() {
           new-checkout-flow
         </p>
 
-        {/* Nav links — placeholders until Part 2 */}
+        {/* Nav links */}
         <div className="flex gap-3 justify-center">
-          
-           <a href="/login"
+          <a href="/login"
             className="bg-forest text-mint font-sans text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition"
           >
             Login
           </a>
           
-            <a href="/flags"
+          <a href="/register"
             className="border border-canopy-border text-canopy-text font-sans text-sm px-4 py-2 rounded-lg hover:bg-white transition"
           >
-            Dashboard →
+            Register Org
           </a>
         </div>
 

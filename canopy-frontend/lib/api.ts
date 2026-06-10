@@ -50,7 +50,7 @@ async function apiFetch<T>(
 }
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
-import type { AuthResponse } from "@/types";
+import type { AuthResponse, Tenant } from "@/types";
 
 export const authApi = {
   register: (email: string, password: string, tenantSlug: string) =>
@@ -63,6 +63,14 @@ export const authApi = {
     apiFetch<AuthResponse>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
+    }),
+};
+
+export const tenantsApi = {
+  create: (name: string) =>
+    apiFetch<Tenant>("/api/tenants", {
+      method: "POST",
+      body: JSON.stringify({ name }),
     }),
 };
 
