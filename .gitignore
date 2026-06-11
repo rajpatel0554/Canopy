@@ -4,3 +4,8 @@ canopy-backend/.idea/
 canopy-backend/*.iml
 .DS_Store
 Thumbs.db
+
+# Spec and reference folders (local only)
+Landing_Page/
+Sign In and Register UI/
+Frontend_details/
