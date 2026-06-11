@@ -1,0 +1,380 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Register - Canopy</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols for icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: '#1c3a2f',
+            sage: '#4ade80',
+            mint: '#6ee7b7',
+            'mint-soft': '#a7f3d0',
+            'mint-dark': '#34d399',
+            linen: '#f7f7f2',
+            surface: '#f9f9ff',
+            'surface-container-lowest': '#ffffff',
+          },
+          fontFamily: {
+            serif: ['"DM Serif Display"', 'serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          borderRadius: {
+            'custom': '8px',
+          },
+          keyframes: {
+            'fade-up': {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            'shimmer-pulse': {
+              '0%, 100%': { opacity: '1' },
+              '50%': { opacity: '0.8', transform: 'scale(1.02)' },
+            },
+            'spinner': {
+              'to': { transform: 'rotate(360deg)' }
+            },
+            'toast-in': {
+              '0%': { transform: 'translateX(100%)', opacity: '0' },
+              '100%': { transform: 'translateX(0)', opacity: '1' }
+            },
+            'progress': {
+              '0%': { width: '100%' },
+              '100%': { width: '0%' }
+            }
+          },
+          animation: {
+            'fade-up': 'fade-up 0.6s ease-out forwards',
+            'shimmer-pulse': 'shimmer-pulse 3s infinite ease-in-out',
+            'spinner': 'spinner 0.6s linear infinite',
+            'toast-in': 'toast-in 0.3s ease-out forwards',
+            'progress-bar': 'progress 3.5s linear forwards'
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body { font-family: 'DM Sans', sans-serif; background-color: #f7f7f2; }
+    h1, h2, h3, .brand-font { font-family: 'DM Serif Display', serif; }
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
+    
+    .feature-pill {
+      background-color: rgba(110, 231, 183, 0.1);
+      border: 1px solid rgba(110, 231, 183, 0.22);
+      transition: all 0.3s ease;
+    }
+    
+    .password-strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background-color: #e5e7eb;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-field-group {
+      transition: all 0.2s ease;
+      border-left: 2.5px solid transparent;
+    }
+
+    .form-field-group:focus-within {
+      background-color: rgba(110, 231, 183, 0.04);
+      border-left: 2.5px solid #6ee7b7;
+    }
+    
+    .input-focus:focus {
+      border-color: #34d399 !important;
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+      outline: none;
+    }
+
+    .btn-loading {
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 9999px !important;
+      padding: 0 !important;
+      font-size: 0 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 md:p-4">
+<main class="flex flex-col md:flex-row w-full max-w-[1000px] min-h-[750px] bg-white shadow-2xl overflow-hidden md:rounded-custom border border-gray-100">
+<!-- LEFT PANEL (Marketing) -->
+<section class="w-full md:w-[42%] bg-forest p-8 md:p-12 flex flex-col justify-between text-white self-stretch">
+<div class="animate-fade-up">
+<!-- Logo -->
+<div class="flex items-center gap-3 mb-16"><div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: rgba(110, 231, 183, 0.18);"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><span class="material-symbols-outlined" style="color: rgb(110, 231, 183); font-size: 20px;">eco</span></div><span class="brand-font text-white text-[20px]">Canopy</span></div>
+<!-- Headline & Subtitle -->
+<div class="mb-12">
+<h1 class="text-4xl md:text-5xl leading-[1.1] mb-6">
+<span class="block">Ship faster.</span>
+<span class="block">Stay in control.</span>
+</h1>
+<p class="text-gray-300 text-lg leading-relaxed max-w-sm">
+            Feature flags, A/B tests, and targeting rules — all in one place for your team.
+          </p>
+</div>
+<!-- Feature Pills -->
+<div class="space-y-4">
+<div class="feature-pill px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-shimmer-pulse">
+<span class="material-symbols-outlined text-mint text-xl">radio_button_checked</span>
+<span class="font-medium text-mint">Instant flag toggles</span>
+</div>
+<div class="feature-pill px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-shimmer-pulse" style="animation-delay: 0.2s">
+<span class="material-symbols-outlined text-mint text-xl">biotech</span>
+<span class="font-medium text-mint">A/B testing built-in</span>
+</div>
+<div class="feature-pill px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-shimmer-pulse" style="animation-delay: 0.4s">
+<span class="material-symbols-outlined text-mint text-xl">groups</span>
+<span class="font-medium text-mint">Multi-tenant ready</span>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-12 text-sm text-gray-500 flex items-center gap-2">
+<span class="">🌿 Portfolio project · Raj Patel</span>
+</footer>
+</section>
+<!-- RIGHT PANEL (Registration Form) -->
+<section class="w-full md:w-[58%] p-8 md:p-14 bg-white overflow-y-auto relative" id="formPanel">
+<!-- Brand -->
+<div class="mb-10"><h2 class="brand-font text-3xl text-forest w-fit inline-block">Canopy<div class="h-[3px] bg-mint mt-2 rounded-full w-full"></div></h2></div>
+<!-- Tab Switcher -->
+<div class="bg-[#e8f5ee] rounded-[12px] p-1 flex gap-1 mb-10">
+<a class="flex-1 py-3 px-6 rounded-[10px] font-bold text-center text-forest transition-all hover:bg-white/50" href="#">Sign In</a>
+<button class="flex-1 py-3 px-6 rounded-[10px] bg-forest text-white font-bold shadow-sm">Register</button>
+</div>
+<!-- Heading -->
+<div class="mb-[14px]">
+<h3 class="brand-font text-[26px] text-forest leading-tight">Create your account</h3>
+<p class="text-gray-400 font-medium">Set up your organization in seconds</p>
+</div>
+<!-- Error Banner -->
+<div class="hidden bg-[#fef2f2] border border-[#fecaca] text-[#dc2626] rounded-custom p-3 text-sm mb-[14px] flex items-center gap-2" id="errorBanner">
+<span class="material-symbols-outlined text-sm">error</span>
+        Please fill in all fields correctly
+      </div>
+<!-- Google SSO -->
+<button class="w-full flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-custom hover:bg-gray-50 transition-colors mb-6">
+<svg class="w-5 h-5" viewBox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="font-bold text-gray-700">Continue with Google</span>
+</button>
+<div class="relative flex items-center justify-center mb-8">
+<div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-100"></div></div>
+<span class="relative bg-white px-4 text-[11px] font-bold text-[#9ca3af] lowercase tracking-widest">or register with email</span>
+</div>
+<form class="space-y-5" id="registerForm">
+<!-- Email Field -->
+<div class="form-field-group rounded-r-custom p-1">
+<div class="flex items-center justify-between mb-2 px-3">
+<label class="text-sm font-bold text-forest" for="email">Email address</label>
+<div class="w-[15px] h-[15px] rounded-full hidden items-center justify-center text-[10px] font-bold" id="emailBadge"></div>
+</div>
+<input class="w-full px-4 py-3 border border-mint-soft rounded-custom input-focus transition-all bg-surface-container-lowest" id="email" placeholder="you@acme-corp.com" required="" type="email">
+</div>
+<!-- Password Field -->
+<div class="form-field-group rounded-r-custom p-1">
+<label class="block text-sm font-bold text-forest mb-2 px-3" for="password">Password</label>
+<div class="relative">
+<input class="w-full px-4 py-3 border border-mint-soft rounded-custom input-focus transition-all bg-surface-container-lowest" id="password" placeholder="Create a password" required="" type="password">
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-forest" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+<!-- Strength Bar -->
+<div class="flex gap-1.5 mt-3 px-3">
+<div class="flex-1 password-strength-bar" id="bar-1"></div>
+<div class="flex-1 password-strength-bar" id="bar-2"></div>
+<div class="flex-1 password-strength-bar" id="bar-3"></div>
+</div>
+<p class="text-[11px] font-medium text-gray-400 mt-2 px-3 flex items-center gap-1" id="strength-msg">
+            Enter a password
+          </p>
+</div>
+<!-- Org Slug Field -->
+<div class="form-field-group rounded-r-custom p-1">
+<label class="block text-sm font-bold text-forest mb-2 px-3" for="slug">Organization slug</label>
+<div class="relative">
+<input class="w-full px-4 py-3 border border-mint-soft rounded-custom font-mono input-focus transition-all bg-surface-container-lowest" id="slug" placeholder="acme-corp" required="" type="text">
+</div>
+<div class="flex items-center gap-2 mt-2 px-3">
+<span class="text-[11px] text-gray-400">e.g.</span>
+<span class="px-2 py-0.5 bg-emerald-50 text-sage text-[11px] font-bold rounded font-mono border border-emerald-100">acme-corp</span>
+</div>
+</div>
+<!-- Submit Button -->
+<div class="mt-6 flex justify-center" id="submitContainer">
+<button class="w-full bg-forest hover:bg-forest/90 text-white font-bold py-4 rounded-custom shadow-lg transition-all active:scale-[0.98]" id="submitBtn" type="submit">
+            Create Account
+          </button>
+</div>
+</form>
+<!-- Bottom Nav -->
+<div class="mt-8 text-center" id="bottomNav">
+<p class="text-gray-500 font-medium">
+          Have an account? <a class="text-forest font-bold hover:underline" href="#">Sign in</a>
+</p>
+</div>
+<!-- Success UI Overlay (Hidden) -->
+<div class="absolute inset-0 bg-white flex flex-col items-center justify-center z-50 hidden animate-fade-up" id="successOverlay">
+<div class="w-[50px] h-[50px] bg-[#d1fae5] rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-mint text-3xl font-bold">check</span>
+</div>
+<h2 class="brand-font text-xl text-forest mb-2 text-center">Account created!</h2>
+<p class="text-forest font-medium text-center">Welcome to Canopy 🌿</p>
+</div>
+</section>
+</main>
+<!-- Toast Notification -->
+<div class="fixed top-6 right-6 w-72 bg-forest rounded-custom shadow-2xl border border-white/10 overflow-hidden z-[60] hidden" id="toast">
+<div class="p-4 flex items-center gap-3">
+<div class="w-8 h-8 bg-mint/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-mint text-sm">leafy_green</span>
+</div>
+<span class="text-sm font-bold text-white">Welcome to Canopy!</span>
+</div>
+<div class="h-1 bg-mint w-full animate-progress-bar"></div>
+</div>
+<script>
+    // Email Validation Logic
+    const emailInput = document.getElementById('email');
+    const emailBadge = document.getElementById('emailBadge');
+    
+    emailInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      
+      if (val.length > 0) {
+        emailBadge.classList.remove('hidden');
+        emailBadge.classList.add('flex');
+        if (isValid) {
+          emailBadge.innerHTML = '✓';
+          emailBadge.className = 'w-[15px] h-[15px] rounded-full flex items-center justify-center text-[10px] font-bold bg-[#d1fae5] text-[#1c3a2f]';
+        } else {
+          emailBadge.innerHTML = '✕';
+          emailBadge.className = 'w-[15px] h-[15px] rounded-full flex items-center justify-center text-[10px] font-bold bg-[#fee2e2] text-[#dc2626]';
+        }
+      } else {
+        emailBadge.classList.add('hidden');
+      }
+    });
+
+    // Password Strength Logic
+    const passwordInput = document.getElementById('password');
+    const msg = document.getElementById('strength-msg');
+    const bars = [
+      document.getElementById('bar-1'),
+      document.getElementById('bar-2'),
+      document.getElementById('bar-3')
+    ];
+
+    passwordInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      bars.forEach(b => b.style.backgroundColor = '#e5e7eb');
+      
+      if (val.length === 0) {
+        msg.textContent = 'Enter a password';
+        msg.className = 'text-[11px] font-medium text-gray-400 mt-2 px-3 flex items-center gap-1';
+      } else if (val.length < 6) {
+        bars[0].style.backgroundColor = '#dc2626'; 
+        msg.textContent = 'Weak — add more characters';
+        msg.className = 'text-[11px] font-medium text-[#dc2626] mt-2 px-3 flex items-center gap-1';
+      } else if (val.length < 10) {
+        bars[0].style.backgroundColor = '#d97706';
+        bars[1].style.backgroundColor = '#d97706';
+        msg.textContent = 'Good — try adding symbols';
+        msg.className = 'text-[11px] font-medium text-[#d97706] mt-2 px-3 flex items-center gap-1';
+      } else {
+        bars.forEach(b => b.style.backgroundColor = '#059669');
+        msg.textContent = 'Strong password ✓';
+        msg.className = 'text-[11px] font-medium text-[#059669] mt-2 px-3 flex items-center gap-1';
+      }
+    });
+
+    // Slug Formatter
+    const slugInput = document.getElementById('slug');
+    slugInput.addEventListener('input', (e) => {
+      let val = e.target.value;
+      val = val.toLowerCase()
+               .replace(/\s+/g, '-')
+               .replace(/[^a-z0-9-]/g, '')
+               .replace(/-+/g, '-');
+      if (val.startsWith('-')) val = val.substring(1);
+      e.target.value = val;
+    });
+
+    function togglePassword() {
+      const input = document.getElementById('password');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    // Form Submission
+    const registerForm = document.getElementById('registerForm');
+    const errorBanner = document.getElementById('errorBanner');
+    const submitBtn = document.getElementById('submitBtn');
+    const successOverlay = document.getElementById('successOverlay');
+    const toast = document.getElementById('toast');
+
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      if (passwordInput.value.length < 6) {
+        errorBanner.classList.remove('hidden');
+        return;
+      }
+      
+      errorBanner.classList.add('hidden');
+      
+      // Loading state
+      submitBtn.classList.add('btn-loading');
+      submitBtn.innerHTML = '<div class="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spinner"></div>';
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        // Confetti burst
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#1c3a2f', '#6ee7b7', '#a7f3d0']
+        });
+
+        // Show Toast
+        toast.classList.remove('hidden');
+        toast.classList.add('animate-toast-in');
+
+        // Show Success Overlay
+        successOverlay.classList.remove('hidden');
+
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3500);
+      }, 1500);
+    });
+  </script>
+
+
+
+
+</body></html>

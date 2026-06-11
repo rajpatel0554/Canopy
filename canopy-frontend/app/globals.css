@@ -483,3 +483,129 @@ body {
   transform: none !important;
   box-shadow: none !important;
 }
+
+/* ── Landing Page Keyframes & Animation Classes ── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes navSlideDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-nav-down {
+  animation: navSlideDown 450ms ease-out forwards;
+}
+
+@keyframes badgeFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-hero-badge {
+  animation: badgeFadeIn 450ms ease-out 100ms both;
+}
+
+@keyframes ctaPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-cta-pop {
+  animation: ctaPop 350ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms both;
+}
+
+@keyframes mockupIn {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-mockup-in {
+  animation: mockupIn 550ms ease-out 1300ms both;
+}
+
+@keyframes stepCircleBounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-step-circle {
+  animation: stepCircleBounce 450ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes codeSlideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-code-left {
+  animation: codeSlideInLeft 500ms ease-out forwards;
+}
+
+@keyframes codeSlideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-code-right {
+  animation: codeSlideInRight 500ms ease-out forwards;
+}
+
+@keyframes togglePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(110, 231, 183, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(110, 231, 183, 0.8);
+  }
+}
+.animate-toggle-pulse {
+  animation: togglePulse 600ms ease-in-out;
+}
+
+.scroll-fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.scroll-fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
