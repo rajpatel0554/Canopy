@@ -1,7 +1,7 @@
 import { auth } from "./auth";
 
 export default auth((req) => {
-  const isLoggedIn = !!req.auth;
+  const isLoggedIn = !!req.auth?.user;
   const { pathname } = req.nextUrl;
 
   // Protected routes — redirect unauthenticated users to login
