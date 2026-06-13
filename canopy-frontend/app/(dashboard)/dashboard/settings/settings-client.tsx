@@ -106,10 +106,21 @@ export default function SettingsClient({
   const scrollToSection = (id: typeof activeSec) => {
     const element = document.getElementById(id);
     if (element) {
-      const yOffset = -80; // Header offset
-      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-      setActiveSec(id);
+      const container = element.closest("main");
+      if (container) {
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        const relativeTop = elementRect.top - containerRect.top + container.scrollTop;
+        
+        container.scrollTo({
+          top: relativeTop - 8,
+          behavior: "smooth"
+        });
+        setActiveSec(id);
+      } else {
+        element.scrollIntoView({ behavior: "smooth" });
+        setActiveSec(id);
+      }
     }
   };
 
@@ -118,12 +129,18 @@ export default function SettingsClient({
       const timer = setTimeout(() => {
         const element = document.getElementById(initialSection);
         if (element) {
-          const yOffset = -80;
-          const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-          window.scrollTo({ top: y, behavior: "instant" as any });
+          const container = element.closest("main");
+          if (container) {
+            const containerRect = container.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
+            const relativeTop = elementRect.top - containerRect.top + container.scrollTop;
+            container.scrollTo({ top: relativeTop - 8, behavior: "instant" as any });
+          } else {
+            element.scrollIntoView({ behavior: "instant" as any });
+          }
           setActiveSec(initialSection);
         }
-      }, 100);
+      }, 150);
       return () => clearTimeout(timer);
     }
   }, [initialSection]);
@@ -131,9 +148,11 @@ export default function SettingsClient({
   // Track scroll position to update active sub-navigation state
   useEffect(() => {
     const sections = ["organization", "profile", "api-keys", "danger-zone"];
+    const container = document.getElementById("organization")?.closest("main") || null;
+
     const observerOptions = {
-      root: null,
-      rootMargin: "-20% 0px -60% 0px",
+      root: container,
+      rootMargin: "-10% 0px -50% 0px",
       threshold: 0,
     };
 
