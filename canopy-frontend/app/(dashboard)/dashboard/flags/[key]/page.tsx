@@ -29,11 +29,14 @@ export default async function FlagDetailPage({ params }: PageProps) {
     return <FlagDetailClient initialFlag={mockFlag} token={token} />;
   }
 
+  let flag;
   try {
-    const flag = await flagsApi.getOne(key, token);
-    return <FlagDetailClient initialFlag={flag} token={token} />;
+    flag = await flagsApi.getOne(key, token);
   } catch (err) {
     console.error("Failed to load flag details:", err);
     return notFound();
   }
+
+  return <FlagDetailClient initialFlag={flag} token={token} />;
+
 }
