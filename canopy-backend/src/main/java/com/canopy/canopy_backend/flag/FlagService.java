@@ -140,4 +140,10 @@ public class FlagService {
         flagRepository.toggleEnabled(key);
         return getFlagByKey(key);                        // ← fetch updated state and return it
     }
+
+    public List<FlagVariation> getVariations(String key) {
+        Flag flag = flagRepository.findByKey(key)
+                .orElseThrow(() -> new RuntimeException("Flag not found: " + key));
+        return variationRepository.findByFlagId(flag.getFlagId());
+    }
 }

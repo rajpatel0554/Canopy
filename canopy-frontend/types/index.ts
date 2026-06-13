@@ -144,3 +144,16 @@ export interface AddSegmentRulePayload {
   operator: RuleOperator;
   value: string;
 }
+
+export interface FlagSegment {
+  segmentId: string;
+  name: string;
+  description: string | null;
+  rules: SegmentRule[];
+  variationId: string | null;
+}
+
+export interface AttachSegmentRequest {
+  segmentId: string;
+  variationId?: string | null;
+}

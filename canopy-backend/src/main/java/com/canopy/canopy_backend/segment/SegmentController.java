@@ -88,33 +88,4 @@ public class SegmentController {
         }
     }
 
-    // ── Flag ↔ Segment Links ───────────────────────────────────────────────
-
-    @PostMapping("/api/flags/{flagKey}/segments")
-    public ResponseEntity<?> attachSegment(
-            @PathVariable String flagKey,
-            @Valid @RequestBody AttachSegmentRequest request
-    ) {
-        try {
-            segmentService.attachSegmentToFlag(flagKey, request);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/api/flags/{flagKey}/segments/{segmentId}")
-    public ResponseEntity<?> detachSegment(
-            @PathVariable String flagKey,
-            @PathVariable UUID segmentId
-    ) {
-        try {
-            segmentService.detachSegmentFromFlag(flagKey, segmentId);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
-    }
 }

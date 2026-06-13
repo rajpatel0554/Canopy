@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -113,5 +114,28 @@ public class SegmentService {
                         "Flag not found: " + flagKey
                 ));
         segmentRepository.detachSegmentFromFlag(flag.getFlagId(), segmentId);
+    }
+
+    public List<FlagSegmentResponse> getAttachedSegmentsForFlag(String flagKey) {
+        Flag flag = flagRepository.findByKey(flagKey)
+                .orElseThrow(() -> new RuntimeException("Flag not found: " + flagKey));
+        
+        List<java.util.Map<String, Object>> rawRows = segmentRepository.findAttachedSegmentsRawByFlagId(flag.getFlagId());
+        
+        return rawRows.stream().map(row -> {
+            UUID segmentId = UUID.fromString((String) row.get("segmentId"));
+            List<SegmentRule> rules = segmentRepository.findRulesBySegmentId(segmentId);
+            
+            String rawVariationId = (String) row.get("variationId");
+            UUID variationId = rawVariationId != null ? UUID.fromString(rawVariationId) : null;
+            
+            return FlagSegmentResponse.builder()
+                    .segmentId(segmentId)
+                    .name((String) row.get("name"))
+                    .description((String) row.get("description"))
+                    .rules(rules)
+                    .variationId(variationId)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

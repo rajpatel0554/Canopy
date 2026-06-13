@@ -190,6 +190,24 @@ public class SegmentRepository {
     // ── Used by evaluation engine ──────────────────────────────────────────
     // Returns all segments attached to a flag, with their rules loaded.
 
+    public List<java.util.Map<String, Object>> findAttachedSegmentsRawByFlagId(UUID flagId) {
+        String schema = TenantContext.getTenantSchema();
+        String sql = """
+                SELECT s.segment_id, s.name, s.description, fs.variation_id
+                FROM "%s".segments s
+                JOIN "%s".flag_segments fs ON s.segment_id = fs.segment_id
+                WHERE fs.flag_id = ?::uuid
+                """.formatted(schema, schema);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            java.util.Map<String, Object> row = new java.util.HashMap<>();
+            row.put("segmentId", rs.getString("segment_id"));
+            row.put("name", rs.getString("name"));
+            row.put("description", rs.getString("description"));
+            row.put("variationId", rs.getString("variation_id"));
+            return row;
+        }, flagId.toString());
+    }
+
     public List<UUID> findSegmentIdsByFlagId(UUID flagId) {
         String schema = TenantContext.getTenantSchema();
         String sql = """

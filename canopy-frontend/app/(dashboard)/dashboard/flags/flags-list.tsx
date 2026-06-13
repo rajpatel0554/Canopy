@@ -290,14 +290,18 @@ export default function FlagsList({ initialFlags, token, segmentsCount = 0 }: Fl
                       }`}
                     >
                       <td className="px-5 py-4">
-                        <span className="font-mono text-xs bg-[#e8f5ee] text-[#1c3a2f] border border-[#d1fae5] px-2 py-1 rounded select-all font-semibold max-w-[170px] truncate inline-block">
-                          {flag.key}
-                        </span>
+                        <Link href={`/dashboard/flags/${flag.key}`} className="hover:opacity-85 transition-opacity">
+                          <span className="font-mono text-xs bg-[#e8f5ee] text-[#1c3a2f] border border-[#d1fae5] px-2 py-1 rounded select-all font-semibold max-w-[170px] truncate inline-block">
+                            {flag.key}
+                          </span>
+                        </Link>
                       </td>
                       
                       <td className="px-5 py-4">
                         <div className="max-w-[280px]">
-                          <p className="text-[13.5px] font-semibold text-[#1c3a2f] truncate">{flag.name}</p>
+                          <Link href={`/dashboard/flags/${flag.key}`} className="hover:underline">
+                            <p className="text-[13.5px] font-semibold text-[#1c3a2f] truncate">{flag.name}</p>
+                          </Link>
                           <p className="text-xs text-canopy-text/60 truncate mt-0.5" title={flag.description || ""}>
                             {flag.description || "No description provided"}
                           </p>
