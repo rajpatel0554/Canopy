@@ -20,7 +20,13 @@ public class SegmentService {
     // ── Segment CRUD ───────────────────────────────────────────────────────
 
     public List<Segment> getAllSegments() {
-        return segmentRepository.findAll();
+        List<Segment> segments = segmentRepository.findAll();
+        java.util.Map<UUID, Integer> counts = segmentRepository.getFlagsCountPerSegment();
+        for (Segment seg : segments) {
+            seg.setRules(segmentRepository.findRulesBySegmentId(seg.getSegmentId()));
+            seg.setFlagsCount(counts.getOrDefault(seg.getSegmentId(), 0));
+        }
+        return segments;
     }
 
     public Segment getSegmentById(UUID segmentId) {
@@ -28,8 +34,9 @@ public class SegmentService {
                 .orElseThrow(() -> new RuntimeException(
                         "Segment not found: " + segmentId
                 ));
-        // Load rules and attach them to the segment object
         segment.setRules(segmentRepository.findRulesBySegmentId(segmentId));
+        segment.setFlagsCount(segmentRepository.countFlagsLinkedToSegment(segmentId));
+        segment.setLinkedFlags(segmentRepository.findLinkedFlagsBySegmentId(segmentId));
         return segment;
     }
 

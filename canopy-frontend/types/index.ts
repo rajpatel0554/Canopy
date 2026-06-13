@@ -126,11 +126,22 @@ export interface SegmentRule {
   value: string;
 }
 
+export interface LinkedFlag {
+  flagId: string;
+  key: string;
+  name: string;
+  enabled: boolean;
+  variationId: string | null;
+  variationValue?: string | null;
+}
+
 export interface Segment {
   segmentId: string;
   name: string;
   description: string | null;
   rules: SegmentRule[];
+  flagsCount?: number;
+  linkedFlags?: LinkedFlag[];
   createdAt: string;
 }
 

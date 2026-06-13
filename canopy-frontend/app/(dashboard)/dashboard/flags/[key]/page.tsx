@@ -5,7 +5,7 @@ import FlagDetailClient from "./flag-detail-client";
 import { notFound } from "next/navigation";
 
 interface PageProps {
-  params: Promise<{ key: string }> | { key: string };
+  params: Promise<{ key: string }>;
 }
 
 export default async function FlagDetailPage({ params }: PageProps) {

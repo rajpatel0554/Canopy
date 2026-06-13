@@ -22,4 +22,6 @@ public class Segment {
 
     // Populated when fetching a single segment — not stored in DB directly
     private List<SegmentRule> rules;
+    private int flagsCount;
+    private List<LinkedFlag> linkedFlags;
 }
