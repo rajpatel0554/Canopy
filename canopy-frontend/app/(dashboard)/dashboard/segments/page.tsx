@@ -56,14 +56,14 @@ export default async function SegmentsPage() {
             const detailed = await segmentsApi.getOne(seg.segmentId, token);
             return {
               ...detailed,
-              flagsCount: 0,
+              flagsCount: detailed.flagsCount ?? 0,
             };
           } catch (err) {
             console.warn(`Failed to load details for segment ${seg.segmentId}`, err);
             return {
               ...seg,
               rules: [],
-              flagsCount: 0,
+              flagsCount: seg.flagsCount ?? 0,
             };
           }
         })
