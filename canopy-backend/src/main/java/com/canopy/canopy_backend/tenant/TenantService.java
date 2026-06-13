@@ -18,8 +18,16 @@ public class TenantService {
     @Transactional
     public Tenant createTenant(String name) {
 
+        if (name == null || name.trim().isEmpty()) {
+            throw new RuntimeException("Tenant name cannot be empty.");
+        }
+
         // Step 1 — Generate slug from name
         String slug = generateSlug(name);
+
+        if (slug.isEmpty()) {
+            throw new RuntimeException("Invalid tenant name. It must contain letters or numbers.");
+        }
 
         // Step 2 — Check if slug already exists
         if (tenantRepository.existsBySlug(slug)) {
