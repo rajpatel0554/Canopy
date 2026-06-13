@@ -38,7 +38,22 @@ async function apiFetch<T>(
     return undefined as T;
   }
 
-  const data = await response.json();
+  let data: any;
+  const contentType = response.headers.get("content-type");
+  
+  try {
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+  } catch (err) {
+    try {
+      data = await response.text();
+    } catch (textErr) {
+      data = "An error occurred";
+    }
+  }
 
   if (!response.ok) {
     const message =

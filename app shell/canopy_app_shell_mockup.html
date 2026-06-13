@@ -1,0 +1,404 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .shell { display: flex; width: 100%; height: 560px; border-radius: var(--border-radius-lg); overflow: hidden; border: 0.5px solid var(--color-border-tertiary); font-family: var(--font-sans); }
+
+  /* SIDEBAR */
+  .sidebar { width: 220px; min-width: 220px; background: #1c3a2f; display: flex; flex-direction: column; transition: width 0.22s ease, min-width 0.22s ease; overflow: hidden; }
+  .sidebar.collapsed { width: 56px; min-width: 56px; }
+
+  .sb-top { padding: 18px 14px 14px; border-bottom: 0.5px solid rgba(110,231,183,0.12); }
+  .sb-brand { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .sb-logo { width: 30px; height: 30px; min-width: 30px; border-radius: 8px; background: rgba(110,231,183,0.15); display: flex; align-items: center; justify-content: center; }
+  .sb-logo i { font-size: 16px; color: #6ee7b7; }
+  .sb-brand-name { font-family: var(--font-serif); font-size: 17px; color: #ffffff; letter-spacing: 0.01em; }
+  .sb-brand-name span { color: #6ee7b7; }
+
+  .sb-org { padding: 12px 14px; border-bottom: 0.5px solid rgba(110,231,183,0.12); }
+  .sb-org-label { font-size: 10px; color: rgba(110,231,183,0.55); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; white-space: nowrap; overflow: hidden; }
+  .sb-org-pill { display: flex; align-items: center; gap: 8px; background: rgba(110,231,183,0.1); border-radius: 7px; padding: 7px 10px; white-space: nowrap; overflow: hidden; }
+  .sb-org-dot { width: 7px; height: 7px; min-width: 7px; border-radius: 50%; background: #6ee7b7; }
+  .sb-org-name { font-family: var(--font-mono); font-size: 12px; color: #a7f3d0; overflow: hidden; text-overflow: ellipsis; }
+
+  .sb-nav { flex: 1; padding: 10px 10px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+  .sb-nav-label { font-size: 10px; color: rgba(110,231,183,0.4); text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 6px 4px; white-space: nowrap; overflow: hidden; }
+  .nav-item { display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; overflow: hidden; transition: background 0.15s; }
+  .nav-item:hover { background: rgba(110,231,183,0.08); }
+  .nav-item.active { background: #ffffff; }
+  .nav-item i { font-size: 18px; min-width: 18px; color: rgba(255,255,255,0.55); }
+  .nav-item.active i { color: #1c3a2f; }
+  .nav-item span { font-size: 13.5px; color: rgba(255,255,255,0.65); font-weight: 400; overflow: hidden; text-overflow: ellipsis; }
+  .nav-item.active span { color: #1c3a2f; font-weight: 500; }
+
+  .sb-bottom { padding: 12px 14px; border-top: 0.5px solid rgba(110,231,183,0.12); }
+  .sb-user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; white-space: nowrap; overflow: hidden; }
+  .sb-avatar { width: 28px; height: 28px; min-width: 28px; border-radius: 50%; background: rgba(110,231,183,0.2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #6ee7b7; font-weight: 500; }
+  .sb-user-info { overflow: hidden; }
+  .sb-user-email { font-size: 12px; color: rgba(255,255,255,0.75); overflow: hidden; text-overflow: ellipsis; }
+  .sb-user-role { font-size: 10.5px; color: rgba(110,231,183,0.55); }
+  .sb-signout { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; overflow: hidden; }
+  .sb-signout:hover { background: rgba(220,38,38,0.12); }
+  .sb-signout i { font-size: 16px; color: rgba(255,255,255,0.35); min-width: 16px; }
+  .sb-signout span { font-size: 12.5px; color: rgba(255,255,255,0.45); }
+
+  .collapse-btn { position: absolute; top: 50%; transform: translateY(-50%); right: -12px; width: 24px; height: 24px; border-radius: 50%; background: #1c3a2f; border: 0.5px solid rgba(110,231,183,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; }
+  .collapse-btn i { font-size: 13px; color: #6ee7b7; transition: transform 0.22s; }
+  .sidebar.collapsed .collapse-btn i { transform: scaleX(-1); }
+
+  /* MAIN AREA */
+  .main { flex: 1; display: flex; flex-direction: column; background: #f7f7f2; overflow: hidden; }
+
+  /* TOP BAR */
+  .topbar { height: 54px; min-height: 54px; background: #ffffff; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+  .topbar-title { font-size: 16px; font-weight: 500; color: #1c3a2f; flex: 1; white-space: nowrap; }
+  .topbar-search { display: flex; align-items: center; gap: 8px; background: #f7f7f2; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 12px; cursor: pointer; }
+  .topbar-search i { font-size: 15px; color: var(--color-text-secondary); }
+  .topbar-search span { font-size: 12.5px; color: var(--color-text-secondary); white-space: nowrap; }
+  .topbar-kbd { font-size: 10px; color: var(--color-text-secondary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 2px 5px; white-space: nowrap; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-icon-btn { width: 34px; height: 34px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: 0.5px solid var(--color-border-tertiary); }
+  .topbar-icon-btn:hover { background: var(--color-background-secondary); }
+  .topbar-icon-btn i { font-size: 17px; color: var(--color-text-secondary); }
+  .topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: #1c3a2f; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #6ee7b7; font-weight: 500; cursor: pointer; }
+  .notif-dot { position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; border-radius: 50%; background: #dc2626; border: 1.5px solid #ffffff; }
+  .notif-wrap { position: relative; }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 24px; overflow: auto; }
+  .content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .content-heading { font-family: var(--font-serif); font-size: 22px; color: #1c3a2f; }
+  .content-subtext { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+  .new-flag-btn { display: flex; align-items: center; gap: 7px; background: #1c3a2f; color: #ffffff; padding: 8px 16px; border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; border: none; }
+  .new-flag-btn i { font-size: 16px; color: #6ee7b7; }
+
+  /* STAT CARDS */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: #ffffff; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 14px 16px; }
+  .stat-label { font-size: 11.5px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 500; color: #1c3a2f; }
+  .stat-badge { display: inline-block; font-size: 10.5px; padding: 2px 7px; border-radius: 20px; margin-top: 4px; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-amber { background: #fef3c7; color: #92400e; }
+
+  /* FLAG TABLE */
+  .flag-table-wrap { background: #ffffff; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; }
+  .flag-table-head { display: grid; grid-template-columns: 1fr 90px 100px 80px; padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); background: #f7f7f2; }
+  .flag-table-head span { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .flag-row { display: grid; grid-template-columns: 1fr 90px 100px 80px; padding: 12px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); align-items: center; }
+  .flag-row:last-child { border-bottom: none; }
+  .flag-name { font-size: 13.5px; font-weight: 500; color: #1c3a2f; }
+  .flag-key { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .flag-type { font-size: 11px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
+  .type-bool { background: #dbeafe; color: #1e40af; }
+  .type-str  { background: #f3e8ff; color: #6b21a8; }
+  .toggle-on  { width: 36px; height: 20px; border-radius: 10px; background: #059669; display: flex; align-items: center; padding: 0 3px; cursor: pointer; }
+  .toggle-off { width: 36px; height: 20px; border-radius: 10px; background: #d1d5db; display: flex; align-items: center; padding: 0 3px; justify-content: flex-end; cursor: pointer; }
+  .toggle-thumb { width: 14px; height: 14px; border-radius: 50%; background: #ffffff; }
+
+  /* SIDEBAR RELATIVE WRAPPER */
+  .sidebar-wrap { position: relative; display: flex; }
+
+  /* COLLAPSED STATES */
+  .sidebar.collapsed .sb-org-label,
+  .sidebar.collapsed .sb-org-name,
+  .sidebar.collapsed .sb-brand-name,
+  .sidebar.collapsed .sb-user-info,
+  .sidebar.collapsed .nav-item span,
+  .sidebar.collapsed .sb-signout span,
+  .sidebar.collapsed .sb-nav-label { opacity: 0; pointer-events: none; }
+  .sidebar.collapsed .sb-org-pill { padding: 7px; justify-content: center; }
+  .sidebar.collapsed .sb-org-dot { margin: 0; }
+  .sidebar.collapsed .sb-user { justify-content: center; }
+  .sidebar.collapsed .sb-signout { justify-content: center; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 9px; }
+  .sidebar.collapsed .sb-top { padding: 18px 12px 14px; }
+
+  .hint-banner { background: rgba(110,231,183,0.1); border: 0.5px solid rgba(110,231,183,0.3); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 12.5px; color: #065f46; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .hint-banner i { font-size: 16px; color: #059669; }
+</style>
+
+<h2 class="sr-only">Canopy app shell mockup showing sidebar navigation, top bar, and dashboard content area</h2>
+
+<div style="padding: 1rem 0;">
+  <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+    <button onclick="toggleSidebar()" style="font-size: 12.5px; padding: 6px 14px;">
+      <i class="ti ti-layout-sidebar" style="font-size:14px; vertical-align:-2px; margin-right:5px;" aria-hidden="true"></i>Toggle collapse
+    </button>
+    <button onclick="switchTab('flags')" style="font-size: 12.5px; padding: 6px 14px;">View: Flags page</button>
+    <button onclick="switchTab('segments')" style="font-size: 12.5px; padding: 6px 14px;">View: Segments page</button>
+    <button onclick="switchTab('settings')" style="font-size: 12.5px; padding: 6px 14px;">View: Settings page</button>
+  </div>
+
+  <div class="shell">
+    <div class="sidebar-wrap">
+      <div class="sidebar" id="sidebar">
+
+        <div class="sb-top">
+          <div class="sb-brand">
+            <div class="sb-logo"><i class="ti ti-plant-2" aria-hidden="true"></i></div>
+            <span class="sb-brand-name">Can<span>opy</span></span>
+          </div>
+        </div>
+
+        <div class="sb-org">
+          <div class="sb-org-label">Organization</div>
+          <div class="sb-org-pill">
+            <div class="sb-org-dot"></div>
+            <span class="sb-org-name" id="orgSlug">acme-corp</span>
+          </div>
+        </div>
+
+        <div class="sb-nav">
+          <div class="sb-nav-label">Menu</div>
+          <div class="nav-item" id="nav-dashboard" onclick="switchTab('dashboard')">
+            <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item active" id="nav-flags" onclick="switchTab('flags')">
+            <i class="ti ti-toggle-right" aria-hidden="true"></i>
+            <span>Feature Flags</span>
+          </div>
+          <div class="nav-item" id="nav-segments" onclick="switchTab('segments')">
+            <i class="ti ti-users-group" aria-hidden="true"></i>
+            <span>Segments</span>
+          </div>
+          <div class="nav-item" id="nav-keys" onclick="switchTab('keys')">
+            <i class="ti ti-key" aria-hidden="true"></i>
+            <span>API Keys</span>
+          </div>
+          <div class="nav-item" id="nav-settings" onclick="switchTab('settings')">
+            <i class="ti ti-settings" aria-hidden="true"></i>
+            <span>Settings</span>
+          </div>
+        </div>
+
+        <div class="sb-bottom">
+          <div class="sb-user">
+            <div class="sb-avatar">RP</div>
+            <div class="sb-user-info">
+              <div class="sb-user-email">raj@acme-corp.io</div>
+              <div class="sb-user-role">Admin</div>
+            </div>
+          </div>
+          <div class="sb-signout">
+            <i class="ti ti-logout" aria-hidden="true"></i>
+            <span>Sign out</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="collapse-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <i class="ti ti-chevrons-left" id="collapseIcon" aria-hidden="true"></i>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <span class="topbar-title" id="pageTitle">Feature Flags</span>
+        <div class="topbar-search">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <span>Search flags...</span>
+          <span class="topbar-kbd">⌘K</span>
+        </div>
+        <div class="topbar-right">
+          <div class="notif-wrap">
+            <div class="topbar-icon-btn"><i class="ti ti-bell" aria-hidden="true"></i></div>
+            <div class="notif-dot"></div>
+          </div>
+          <div class="topbar-avatar">RP</div>
+        </div>
+      </div>
+
+      <div class="content" id="pageContent">
+        <div class="hint-banner">
+          <i class="ti ti-info-circle" aria-hidden="true"></i>
+          This is a mockup — click the buttons above to preview different pages and toggle the sidebar.
+        </div>
+
+        <div class="content-header">
+          <div>
+            <div class="content-heading">Feature Flags</div>
+            <div class="content-subtext">Manage and control feature rollouts for acme-corp</div>
+          </div>
+          <button class="new-flag-btn">
+            <i class="ti ti-plus" aria-hidden="true"></i>
+            New Flag
+          </button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Total Flags</div>
+            <div class="stat-value">12</div>
+            <div class="stat-badge badge-green">8 active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">In Rollout</div>
+            <div class="stat-value">3</div>
+            <div class="stat-badge badge-amber">partial</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Segments</div>
+            <div class="stat-value">5</div>
+            <div class="stat-badge badge-green">all active</div>
+          </div>
+        </div>
+
+        <div class="flag-table-wrap">
+          <div class="flag-table-head">
+            <span>Flag</span><span>Type</span><span>Status</span><span>Toggle</span>
+          </div>
+          <div class="flag-row">
+            <div><div class="flag-name">New Checkout Flow</div><div class="flag-key">new-checkout-flow</div></div>
+            <div><span class="flag-type type-bool">Boolean</span></div>
+            <div><span class="stat-badge badge-green">Enabled</span></div>
+            <div><div class="toggle-on"><div class="toggle-thumb"></div></div></div>
+          </div>
+          <div class="flag-row">
+            <div><div class="flag-name">Dark Mode Beta</div><div class="flag-key">dark-mode-beta</div></div>
+            <div><span class="flag-type type-str">String</span></div>
+            <div><span class="stat-badge badge-amber">Partial</span></div>
+            <div><div class="toggle-on"><div class="toggle-thumb"></div></div></div>
+          </div>
+          <div class="flag-row">
+            <div><div class="flag-name">Legacy Dashboard</div><div class="flag-key">legacy-dashboard</div></div>
+            <div><span class="flag-type type-bool">Boolean</span></div>
+            <div><span style="font-size:11px;color:var(--color-text-secondary);">Disabled</span></div>
+            <div><div class="toggle-off"><div class="toggle-thumb"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let collapsed = false;
+
+  function toggleSidebar() {
+    collapsed = !collapsed;
+    const sb = document.getElementById('sidebar');
+    const icon = document.getElementById('collapseIcon');
+    if (collapsed) {
+      sb.classList.add('collapsed');
+    } else {
+      sb.classList.remove('collapsed');
+    }
+  }
+
+  const pages = {
+    flags: {
+      title: 'Feature Flags',
+      search: 'Search flags...',
+      active: 'nav-flags',
+      content: `
+        <div class="content-header">
+          <div><div class="content-heading">Feature Flags</div><div class="content-subtext">Manage and control feature rollouts for acme-corp</div></div>
+          <button class="new-flag-btn"><i class="ti ti-plus" aria-hidden="true"></i> New Flag</button>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Flags</div><div class="stat-value">12</div><div class="stat-badge badge-green">8 active</div></div>
+          <div class="stat-card"><div class="stat-label">In Rollout</div><div class="stat-value">3</div><div class="stat-badge badge-amber">partial</div></div>
+          <div class="stat-card"><div class="stat-label">Segments</div><div class="stat-value">5</div><div class="stat-badge badge-green">all active</div></div>
+        </div>
+        <div class="flag-table-wrap">
+          <div class="flag-table-head"><span>Flag</span><span>Type</span><span>Status</span><span>Toggle</span></div>
+          <div class="flag-row"><div><div class="flag-name">New Checkout Flow</div><div class="flag-key">new-checkout-flow</div></div><div><span class="flag-type type-bool">Boolean</span></div><div><span class="stat-badge badge-green">Enabled</span></div><div><div class="toggle-on"><div class="toggle-thumb"></div></div></div></div>
+          <div class="flag-row"><div><div class="flag-name">Dark Mode Beta</div><div class="flag-key">dark-mode-beta</div></div><div><span class="flag-type type-str">String</span></div><div><span class="stat-badge badge-amber">Partial</span></div><div><div class="toggle-on"><div class="toggle-thumb"></div></div></div></div>
+          <div class="flag-row"><div><div class="flag-name">Legacy Dashboard</div><div class="flag-key">legacy-dashboard</div></div><div><span class="flag-type type-bool">Boolean</span></div><div><span style="font-size:11px;color:var(--color-text-secondary);">Disabled</span></div><div><div class="toggle-off"><div class="toggle-thumb"></div></div></div></div>
+        </div>`
+    },
+    segments: {
+      title: 'Segments',
+      search: 'Search segments...',
+      active: 'nav-segments',
+      content: `
+        <div class="content-header">
+          <div><div class="content-heading">Segments</div><div class="content-subtext">Reusable user cohorts for targeting rules</div></div>
+          <button class="new-flag-btn"><i class="ti ti-plus" aria-hidden="true"></i> New Segment</button>
+        </div>
+        <div class="flag-table-wrap">
+          <div class="flag-table-head"><span>Segment</span><span>Rules</span><span>Flags</span><span></span></div>
+          <div class="flag-row"><div><div class="flag-name">Beta Testers</div><div class="flag-key">segment · 3 rules</div></div><div><span class="stat-badge badge-green">3</span></div><div><span class="stat-badge badge-green">4 flags</span></div><div><i class="ti ti-dots" style="color:var(--color-text-secondary);font-size:17px;cursor:pointer;" aria-hidden="true"></i></div></div>
+          <div class="flag-row"><div><div class="flag-name">Premium Users</div><div class="flag-key">segment · 2 rules</div></div><div><span class="stat-badge badge-green">2</span></div><div><span class="stat-badge badge-amber">2 flags</span></div><div><i class="ti ti-dots" style="color:var(--color-text-secondary);font-size:17px;cursor:pointer;" aria-hidden="true"></i></div></div>
+          <div class="flag-row"><div><div class="flag-name">Internal Employees</div><div class="flag-key">segment · 1 rule</div></div><div><span class="stat-badge badge-green">1</span></div><div><span class="stat-badge badge-green">6 flags</span></div><div><i class="ti ti-dots" style="color:var(--color-text-secondary);font-size:17px;cursor:pointer;" aria-hidden="true"></i></div></div>
+        </div>`
+    },
+    settings: {
+      title: 'Settings',
+      search: 'Search settings...',
+      active: 'nav-settings',
+      content: `
+        <div class="content-header">
+          <div><div class="content-heading">Settings</div><div class="content-subtext">Organization and account configuration</div></div>
+        </div>
+        <div style="display:grid;gap:12px;">
+          <div class="flag-table-wrap" style="padding:18px 20px;">
+            <div style="font-size:13.5px;font-weight:500;color:#1c3a2f;margin-bottom:4px;">Organization</div>
+            <div style="font-size:12.5px;color:var(--color-text-secondary);margin-bottom:12px;">Your organization slug and display name</div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="font-family:var(--font-mono);font-size:12px;background:#f7f7f2;padding:6px 12px;border-radius:6px;color:#1c3a2f;border:0.5px solid var(--color-border-tertiary);">acme-corp</div>
+              <span style="font-size:12px;color:var(--color-text-secondary);">Acme Corporation</span>
+            </div>
+          </div>
+          <div class="flag-table-wrap" style="padding:18px 20px;">
+            <div style="font-size:13.5px;font-weight:500;color:#1c3a2f;margin-bottom:4px;">API Keys</div>
+            <div style="font-size:12.5px;color:var(--color-text-secondary);margin-bottom:12px;">Manage API keys for SDK access</div>
+            <div style="font-family:var(--font-mono);font-size:11.5px;background:#f7f7f2;padding:8px 12px;border-radius:6px;color:#9ca3af;border:0.5px solid var(--color-border-tertiary);">cnpy_live_••••••••••••••••••••••</div>
+          </div>
+        </div>`
+    },
+    dashboard: {
+      title: 'Dashboard',
+      search: 'Search...',
+      active: 'nav-dashboard',
+      content: `
+        <div class="content-header">
+          <div><div class="content-heading">Dashboard</div><div class="content-subtext">Welcome back, Raj — acme-corp</div></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Flags</div><div class="stat-value">12</div><div class="stat-badge badge-green">healthy</div></div>
+          <div class="stat-card"><div class="stat-label">Active Segments</div><div class="stat-value">5</div><div class="stat-badge badge-green">all active</div></div>
+          <div class="stat-card"><div class="stat-label">Evaluations today</div><div class="stat-value">1.4k</div><div class="stat-badge badge-green">+12%</div></div>
+        </div>
+        <div class="flag-table-wrap" style="padding:16px 18px;">
+          <div style="font-size:13.5px;font-weight:500;color:#1c3a2f;margin-bottom:12px;">Recent activity</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;"><span class="stat-badge badge-green">Enabled</span><span style="font-family:var(--font-mono);color:#1c3a2f;">new-checkout-flow</span><span style="color:var(--color-text-secondary);">2 min ago</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;"><span class="stat-badge badge-amber">Updated</span><span style="font-family:var(--font-mono);color:#1c3a2f;">dark-mode-beta</span><span style="color:var(--color-text-secondary);">18 min ago</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;"><span style="font-size:11px;color:var(--color-text-secondary);padding:2px 7px;border-radius:20px;background:var(--color-background-secondary);">Disabled</span><span style="font-family:var(--font-mono);color:#1c3a2f;">legacy-dashboard</span><span style="color:var(--color-text-secondary);">1 hr ago</span></div>
+          </div>
+        </div>`
+    },
+    keys: {
+      title: 'API Keys',
+      search: 'Search keys...',
+      active: 'nav-keys',
+      content: `
+        <div class="content-header">
+          <div><div class="content-heading">API Keys</div><div class="content-subtext">Keys for integrating Canopy SDK into your apps</div></div>
+          <button class="new-flag-btn"><i class="ti ti-plus" aria-hidden="true"></i> New Key</button>
+        </div>
+        <div class="flag-table-wrap">
+          <div class="flag-table-head"><span>Name</span><span>Created</span><span>Last used</span><span></span></div>
+          <div class="flag-row"><div><div class="flag-name">Production</div><div class="flag-key" style="font-family:var(--font-mono);">cnpy_live_••••••••••</div></div><div style="font-size:12px;color:var(--color-text-secondary);">Jun 1</div><div style="font-size:12px;color:var(--color-text-secondary);">2 hrs ago</div><div><i class="ti ti-trash" style="color:#dc2626;font-size:16px;cursor:pointer;" aria-hidden="true"></i></div></div>
+          <div class="flag-row"><div><div class="flag-name">Staging</div><div class="flag-key" style="font-family:var(--font-mono);">cnpy_test_••••••••••</div></div><div style="font-size:12px;color:var(--color-text-secondary);">May 20</div><div style="font-size:12px;color:var(--color-text-secondary);">1 day ago</div><div><i class="ti ti-trash" style="color:#dc2626;font-size:16px;cursor:pointer;" aria-hidden="true"></i></div></div>
+        </div>`
+    }
+  };
+
+  const navIds = ['nav-flags','nav-segments','nav-settings','nav-dashboard','nav-keys'];
+
+  function switchTab(tab) {
+    const page = pages[tab];
+    if (!page) return;
+    document.getElementById('pageTitle').textContent = page.title;
+    document.getElementById('pageContent').innerHTML = page.content;
+    navIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    });
+    const activeEl = document.getElementById(page.active);
+    if (activeEl) activeEl.classList.add('active');
+  }
+</script>

@@ -44,6 +44,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = (user as any).role
         token.tenantId = (user as any).tenantId
       }
+      
+      // Always extract tenantSlug from accessToken
+      if (token.accessToken) {
+        try {
+          const parts = (token.accessToken as string).split(".");
+          if (parts.length === 3) {
+            const payload = JSON.parse(Buffer.from(parts[1], "base64").toString());
+            token.tenantSlug = payload.tenantSlug;
+          }
+        } catch (e) {
+          console.error("Failed to decode token for tenantSlug:", e);
+        }
+      }
       return token
     },
     async session({ session, token }) {
@@ -51,6 +64,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         (session.user as any).token = token.accessToken as string;
         (session.user as any).role = token.role as string;
         (session.user as any).tenantId = token.tenantId as string;
+        
+        // Extract dynamically or fallback
+        try {
+          const parts = (token.accessToken as string).split(".");
+          if (parts.length === 3) {
+            const payload = JSON.parse(Buffer.from(parts[1], "base64").toString());
+            (session.user as any).tenantSlug = payload.tenantSlug;
+          }
+        } catch (e) {
+          (session.user as any).tenantSlug = (token as any).tenantSlug as string;
+        }
       }
       return session
     }

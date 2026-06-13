@@ -29,9 +29,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/tenants").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/tenants/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -5,10 +5,7 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   // Protected routes — redirect unauthenticated users to login
-  const isProtectedRoute =
-    pathname.startsWith("/flags") ||
-    pathname.startsWith("/segments") ||
-    pathname.startsWith("/dashboard");
+  const isProtectedRoute = pathname.startsWith("/dashboard");
 
   if (isProtectedRoute && !isLoggedIn) {
     return Response.redirect(new URL("/login", req.nextUrl));
@@ -16,7 +13,7 @@ export default auth((req) => {
 
   // Auth pages — redirect logged in users to flags list
   if (isLoggedIn && (pathname === "/login" || pathname === "/register")) {
-    return Response.redirect(new URL("/flags", req.nextUrl));
+    return Response.redirect(new URL("/dashboard", req.nextUrl));
   }
 });
 

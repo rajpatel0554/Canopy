@@ -75,7 +75,7 @@ export default function LoginPage() {
         } else {
           setSuccess(true)
           setTimeout(() => {
-            router.push("/flags")
+            router.push("/dashboard")
             router.refresh()
           }, 1000)
         }

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add Segment | Canopy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tabler Icons -->
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "forest": "#1c3a2f",
+                        "mint": "#34d399",
+                        "mint-light": "#d1fae5",
+                        "mint-mid": "#6ee7b7",
+                        "linen": "#f7f7f2",
+                        "near-black": "#111827",
+                        "muted": "#9ca3af",
+                        "success": "#059669",
+                        "danger": "#dc2626",
+                        "warning": "#d97706",
+                        "border-light": "#e5e7eb",
+                        "secondary-text": "#374151"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "12px": "12px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["DM Serif Display", "serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "code": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .sidebar { width: 200px; }
+        .topbar { height: 54px; }
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.2);
+            border-color: #34d399 !important;
+        }
+    </style>
+</head>
+<body class="bg-linen min-h-screen text-near-black">
+<!-- App Shell Sidebar -->
+<aside class="sidebar fixed top-0 left-0 bottom-0 bg-forest z-50 flex flex-col items-center py-6">
+<div class="w-10 h-10 bg-mint rounded-lg mb-8 flex items-center justify-center">
+<span class="ti ti-leaf text-forest text-2xl"></span>
+</div>
+<nav class="flex flex-col gap-4 w-full px-4">
+<a class="flex items-center gap-3 px-3 py-2 text-mint/60 hover:text-white transition-colors" href="#">
+<span class="ti ti-layout-dashboard text-lg"></span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-mint/60 hover:text-white transition-colors" href="#">
+<span class="ti ti-flag text-lg"></span>
+<span class="text-sm font-medium">Feature Flags</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-white rounded-full text-forest transition-colors" href="#">
+<span class="ti ti-users text-lg"></span>
+<span class="text-sm font-bold">Segments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-mint/60 hover:text-white transition-colors" href="#">
+<span class="ti ti-key text-lg"></span>
+<span class="text-sm font-medium">API Keys</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-mint/60 hover:text-white transition-colors" href="#">
+<span class="ti ti-settings text-lg"></span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<div class="ml-[200px]">
+<!-- Top Bar -->
+<header class="topbar fixed top-0 right-0 left-[200px] bg-white border-b border-border-light px-6 flex items-center justify-between z-40">
+<div class="flex items-center gap-2">
+<h2 class="text-sm font-bold text-near-black">Add Segment</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-muted"></span>
+<input class="bg-linen/50 border-none rounded-full h-8 pl-9 pr-4 text-xs w-48 focus:ring-0" placeholder="Search..." type="text"/>
+</div>
+<div class="w-8 h-8 rounded-full bg-mint-light flex items-center justify-center text-forest font-bold text-xs border border-mint/20">RP</div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="pt-[54px] p-6 max-w-[1000px] mx-auto">
+<!-- Error State (Hidden by default) -->
+<div class="hidden mb-6 bg-[#fef2f2] border border-[#fee2e2] p-4 rounded-lg flex items-center gap-3 text-danger" id="error-banner">
+<span class="ti ti-alert-circle text-lg"></span>
+<p class="text-sm font-medium">Failed to create segment. Please check your inputs and try again.</p>
+</div>
+<!-- Header -->
+<div class="flex items-end justify-between mb-8">
+<div>
+<h1 class="font-headline text-[28px] text-near-black leading-tight">Add Segment</h1>
+<p class="text-muted text-[14px] mt-1 font-body">Define a reusable user cohort for targeting rules</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2 rounded-lg border border-[#d1d5db] text-secondary-text font-medium hover:bg-white transition-all text-sm">
+                    Cancel
+                </button>
+<button class="bg-forest text-white px-6 py-2 rounded-lg font-medium hover:opacity-95 transition-all flex items-center gap-2 shadow-sm text-sm min-w-[140px] justify-center" id="save-btn">
+<span id="btn-text">Save Segment</span>
+<span class="hidden animate-spin ti ti-loader-2" id="loading-spinner"></span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Section 1: Basic Info -->
+<section class="bg-white border border-border-light rounded-12px p-6 shadow-sm space-y-6">
+<div>
+<label class="block text-[11px] uppercase tracking-wider text-muted font-bold mb-2 font-body">SEGMENT NAME</label>
+<input class="w-full h-[40px] px-4 border border-border-light rounded-lg transition-all font-body text-near-black placeholder:text-muted/60" id="segment-name" placeholder="e.g. Beta Testers" required="" type="text"/>
+<p class="hidden text-danger text-[11px] mt-1 font-medium" id="name-error">This field is required</p>
+</div>
+<div>
+<label class="block text-[11px] uppercase tracking-wider text-muted font-bold mb-2 font-body">DESCRIPTION</label>
+<textarea class="w-full px-4 py-3 border border-border-light rounded-lg transition-all font-body text-near-black placeholder:text-muted/60" placeholder="Optional — describe who belongs in this segment..." rows="3"></textarea>
+</div>
+</section>
+<!-- Section 2: Rules -->
+<section class="bg-white border border-border-light rounded-12px p-6 shadow-sm space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<h2 class="text-[14px] font-semibold text-near-black">Rules</h2>
+<span class="px-2 py-0.5 bg-mint-light text-success text-[11px] font-bold rounded-full">2 RULES</span>
+</div>
+</div>
+<div class="space-y-3" id="rules-container">
+<!-- Rule Row 1 -->
+<div class="bg-[#f9fafb] border-l-[3px] border-mint-mid p-3 rounded-r-lg flex items-center gap-3">
+<div class="flex flex-1 gap-3">
+<div class="w-[30%]">
+<input class="w-full h-[38px] px-3 bg-white border border-border-light rounded font-code text-xs text-forest" placeholder="attribute e.g. email, plan, country" type="text" value="plan"/>
+</div>
+<div class="w-[28%]">
+<select class="w-full h-[38px] px-3 bg-white border border-border-light rounded text-xs text-near-black appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_12px_center] bg-no-repeat">
+<option value="EQUALS">EQUALS</option>
+<option value="NOT_EQUALS">NOT_EQUALS</option>
+<option value="CONTAINS">CONTAINS</option>
+<option value="NOT_CONTAINS">NOT_CONTAINS</option>
+<option value="STARTS_WITH">STARTS_WITH</option>
+<option value="ENDS_WITH">ENDS_WITH</option>
+</select>
+</div>
+<div class="w-[35%]">
+<input class="w-full h-[38px] px-3 bg-white border border-border-light rounded font-code text-xs text-forest" placeholder="value e.g. @acme.com" type="text" value="enterprise"/>
+</div>
+</div>
+<button class="text-muted hover:text-danger transition-colors p-1">
+<span class="ti ti-trash text-lg"></span>
+</button>
+</div>
+<!-- Rule Row 2 -->
+<div class="bg-[#f9fafb] border-l-[3px] border-mint-mid p-3 rounded-r-lg flex items-center gap-3">
+<div class="flex flex-1 gap-3">
+<div class="w-[30%]">
+<input class="w-full h-[38px] px-3 bg-white border border-border-light rounded font-code text-xs text-forest" placeholder="attribute e.g. email, plan, country" type="text" value="country"/>
+</div>
+<div class="w-[28%]">
+<select class="w-full h-[38px] px-3 bg-white border border-border-light rounded text-xs text-near-black appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_12px_center] bg-no-repeat">
+<option selected="" value="EQUALS">EQUALS</option>
+<option value="NOT_EQUALS">NOT_EQUALS</option>
+<option value="CONTAINS">CONTAINS</option>
+<option value="NOT_CONTAINS">NOT_CONTAINS</option>
+<option value="STARTS_WITH">STARTS_WITH</option>
+<option value="ENDS_WITH">ENDS_WITH</option>
+</select>
+</div>
+<div class="w-[35%]">
+<input class="w-full h-[38px] px-3 bg-white border border-border-light rounded font-code text-xs text-forest" placeholder="value e.g. @acme.com" type="text" value="US"/>
+</div>
+</div>
+<button class="text-muted hover:text-danger transition-colors p-1">
+<span class="ti ti-trash text-lg"></span>
+</button>
+</div>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-border-light rounded-lg text-muted hover:border-mint hover:text-forest transition-all flex items-center justify-center gap-2 text-sm font-medium mt-2">
+<span class="ti ti-plus text-lg"></span>
+                    Add Rule
+                </button>
+<div class="flex items-center gap-2 text-[12px] text-muted pt-2 border-t border-border-light mt-4">
+<span class="ti ti-info-circle text-base"></span>
+<span>A user must match <strong class="text-near-black">ALL</strong> rules to be included in this segment.</span>
+</div>
+</section>
+</div>
+</main>
+</div>
+<script>
+    // Simple UI interaction logic
+    const saveBtn = document.getElementById('save-btn');
+    const btnText = document.getElementById('btn-text');
+    const spinner = document.getElementById('loading-spinner');
+    const nameInput = document.getElementById('segment-name');
+    const nameError = document.getElementById('name-error');
+    const errorBanner = document.getElementById('error-banner');
+
+    saveBtn.addEventListener('click', () => {
+        // Basic Validation
+        if (!nameInput.value.trim()) {
+            nameInput.classList.add('border-danger');
+            nameError.classList.remove('hidden');
+            return;
+        } else {
+            nameInput.classList.remove('border-danger');
+            nameError.classList.add('hidden');
+        }
+
+        // Loading State
+        saveBtn.disabled = true;
+        saveBtn.classList.add('opacity-80');
+        btnText.textContent = 'Saving...';
+        spinner.classList.remove('hidden');
+        errorBanner.classList.add('hidden');
+
+        // Simulate API flow
+        setTimeout(() => {
+            // Simulate random error or success
+            const success = Math.random() > 0.3;
+            
+            if (success) {
+                btnText.textContent = 'Saved!';
+                spinner.classList.add('hidden');
+                setTimeout(() => {
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('opacity-80');
+                    btnText.textContent = 'Save Segment';
+                }, 2000);
+            } else {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('opacity-80');
+                btnText.textContent = 'Save Segment';
+                spinner.classList.add('hidden');
+                errorBanner.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }, 1500);
+    });
+
+    nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim()) {
+            nameInput.classList.remove('border-danger');
+            nameError.classList.add('hidden');
+        }
+    });
+</script>
+</body></html>

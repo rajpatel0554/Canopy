@@ -155,7 +155,7 @@ export default function RegisterPage() {
           await signIn("credentials", {
             email,
             password,
-            callbackUrl: "/flags",
+            callbackUrl: "/dashboard",
           })
         }, 2500)
 
@@ -379,13 +379,33 @@ export default function RegisterPage() {
                     </span>
                   </button>
                 </div>
-                
                 {/* Strength Bar Block (fixed 32px height layout-shift free) */}
                 <div className="strength-block">
                   <div className="flex gap-1.5 mt-2 px-3">
-                    <div className={`flex-1 password-strength-bar ${strengthScore >= 1 ? (strengthScore === 1 ? 'bg-[#dc2626]' : strengthScore === 2 ? 'bg-[#d97706]' : 'bg-[#059669]') : 'bg-gray-200'}`}></div>
-                    <div className={`flex-1 password-strength-bar ${strengthScore >= 2 ? (strengthScore === 2 ? 'bg-[#d97706]' : 'bg-[#059669]') : 'bg-gray-200'}`}></div>
-                    <div className={`flex-1 password-strength-bar ${strengthScore >= 3 ? 'bg-[#059669]' : 'bg-gray-200'}`}></div>
+                    <div 
+                      className="flex-1 password-strength-bar" 
+                      style={{ 
+                        backgroundColor: strengthScore >= 1 
+                          ? (strengthScore === 1 ? '#dc2626' : strengthScore === 2 ? '#d97706' : '#059669') 
+                          : '#e5e7eb' 
+                      }}
+                    ></div>
+                    <div 
+                      className="flex-1 password-strength-bar" 
+                      style={{ 
+                        backgroundColor: strengthScore >= 2 
+                          ? (strengthScore === 2 ? '#d97706' : '#059669') 
+                          : '#e5e7eb' 
+                      }}
+                    ></div>
+                    <div 
+                      className="flex-1 password-strength-bar" 
+                      style={{ 
+                        backgroundColor: strengthScore >= 3 
+                          ? '#059669' 
+                          : '#e5e7eb' 
+                      }}
+                    ></div>
                   </div>
                   <p className={`text-[11px] font-medium mt-1 px-3 flex items-center gap-1 ${strength.colorClass}`}>
                     {strength.label}
@@ -506,8 +526,8 @@ export default function RegisterPage() {
       >
         <div className="p-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-mint/20 rounded-full flex items-center justify-center">
-              <span className="material-symbols-outlined text-mint text-sm">leafy_green</span>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(110, 231, 183, 0.18)" }}>
+              <span className="material-symbols-outlined" style={{ color: "#6ee7b7", fontSize: "20px" }}>eco</span>
             </div>
             <span className="text-sm font-bold text-white">Welcome to Canopy!</span>
           </div>

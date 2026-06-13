@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Feature Flag | Canopy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,wght@0,400;0,600;0,700;1,400&amp;family=JetBrains+Mono&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&amp;family=DM+Serif+Display:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mono-font { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Staggered Entrance */
+        .stagger-card {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typewriter Flash */
+        @keyframes flash {
+            0% { background-color: transparent; }
+            50% { background-color: #d1fae5; }
+            100% { background-color: transparent; }
+        }
+        .animate-flash { animation: flash 0.3s ease-out; }
+
+        /* Pulse for rollout */
+        @keyframes pulse-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .animate-pulse-scale { animation: pulse-scale 0.2s ease-in-out; }
+
+        /* Loading Morph */
+        .loading-state {
+            pointer-events: none;
+            width: 40px !important;
+            border-radius: 50% !important;
+            overflow: hidden;
+            text-indent: -9999px;
+        }
+        .loading-state::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #6ee7b7;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            left: calc(50% - 10px);
+            top: calc(50% - 10px);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Preview Highlight */
+        .highlight-change {
+            color: #6ee7b7;
+            transition: color 0.5s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #1c3a2f;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #6ee7b7;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "background": "#f7f7f2",
+                "on-secondary-fixed": "#002115",
+                "tertiary-container": "#333532",
+                "primary-fixed": "#c8eada",
+                "surface-bright": "#f9f9ff",
+                "on-primary": "#ffffff",
+                "on-secondary-container": "#007353",
+                "secondary": "#006c4e",
+                "on-tertiary-fixed-variant": "#454744",
+                "on-tertiary": "#ffffff",
+                "outline-variant": "#c1c8c3",
+                "surface": "#f9f9ff",
+                "error-container": "#ffdad6",
+                "surface-container": "#e6eeff",
+                "on-background": "#121c2a",
+                "on-surface-variant": "#414845",
+                "on-error-container": "#93000a",
+                "tertiary": "#1e201d",
+                "surface-container-high": "#dee9fd",
+                "primary-fixed-dim": "#adcebe",
+                "error": "#ba1a1a",
+                "on-tertiary-fixed": "#1a1c19",
+                "secondary-fixed-dim": "#62dcad",
+                "on-primary-container": "#84a496",
+                "on-surface": "#121c2a",
+                "outline": "#727974",
+                "surface-container-low": "#eff3ff",
+                "secondary-fixed": "#80f9c8",
+                "on-primary-fixed-variant": "#2f4d41",
+                "tertiary-fixed": "#e2e3de",
+                "surface-variant": "#d9e3f7",
+                "on-secondary": "#ffffff",
+                "inverse-surface": "#273140",
+                "primary-container": "#1c3a2f",
+                "primary": "#05241a",
+                "on-error": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary-container": "#9c9d99",
+                "inverse-on-surface": "#ebf1ff",
+                "tertiary-fixed-dim": "#c6c7c2",
+                "inverse-primary": "#adcebe",
+                "surface-tint": "#466558",
+                "on-primary-fixed": "#012017",
+                "surface-dim": "#d0daef",
+                "secondary-container": "#80f9c8",
+                "surface-container-highest": "#d9e3f7",
+                "on-secondary-fixed-variant": "#00513a"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+              },
+              "spacing": {
+                "margin-desktop": "32px",
+                "stack-lg": "24px",
+                "stack-md": "16px",
+                "container-max": "1280px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "stack-sm": "8px",
+                "base": "4px"
+              },
+              "fontFamily": {
+                "headline-lg": ["DM Serif Display"],
+                "body-lg": ["DM Sans"],
+                "title-lg": ["DM Sans"],
+                "label-md": ["DM Sans"],
+                "code-md": ["JetBrains Mono"],
+                "body-md": ["DM Sans"],
+                "headline-md": ["DM Serif Display"]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background min-h-screen p-[28px] font-body-md text-on-background">
+<!-- Main Container -->
+<div class="max-w-container-max mx-auto">
+<!-- Header -->
+<header class="flex flex-col md:flex-row md:items-center justify-between mb-stack-lg gap-4">
+<div>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-2" href="/dashboard/flags">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="font-label-md text-label-md">BACK TO FLAGS</span>
+</a>
+<h1 class="font-headline-lg text-headline-lg text-primary">Create Feature Flag</h1>
+<p class="text-on-surface-variant font-body-md">Define a new toggle to control features across your environments.</p>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="px-stack-md py-2 font-label-md text-label-md text-primary bg-primary-fixed border border-outline-variant rounded-lg hover:bg-primary-fixed-dim transition-colors">
+                    Save as Draft
+                </button>
+<button class="relative flex items-center gap-2 px-stack-md py-2 font-label-md text-label-md bg-primary-container text-secondary-container rounded-lg hover:opacity-90 transition-all" id="createBtn" onclick="handleCreate()">
+<span>Create Flag</span>
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+</div>
+</header>
+<!-- Two Column Layout -->
+<main class="flex flex-col lg:flex-row gap-gutter">
+<!-- Left Column: Form -->
+<div class="flex-1 max-w-[640px] space-y-stack-md">
+<!-- 1. Basic Info -->
+<section class="stagger-card bg-white border border-secondary-container p-stack-md rounded-xl" style="animation-delay: 80ms;">
+<h3 class="font-title-lg text-title-lg text-primary mb-stack-md">Basic Information</h3>
+<div class="space-y-4">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">FLAG NAME</label>
+<input class="w-full bg-white border border-secondary-container rounded-lg px-3 py-2 focus:ring-2 focus:ring-secondary-container focus:border-primary outline-none transition-all font-body-md" id="flagName" oninput="syncSlug(this.value)" placeholder="e.g. New User Dashboard" type="text"/>
+<p class="hidden text-error text-[12px] mt-1 font-label-md" id="nameError">Flag name is required</p>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">FLAG KEY</label>
+<div class="flex items-center bg-background rounded-lg border border-outline-variant px-3 py-2">
+<span class="font-code-md text-code-md text-primary opacity-70" id="flagKey">new-user-dashboard</span>
+<span class="material-symbols-outlined text-on-surface-variant ml-auto text-[18px] cursor-help" title="Immutable identifier used in code">info</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">DESCRIPTION (OPTIONAL)</label>
+<textarea class="w-full bg-white border border-secondary-container rounded-lg px-3 py-2 focus:ring-2 focus:ring-secondary-container focus:border-primary outline-none transition-all font-body-md" oninput="updatePreview('description', this.value)" placeholder="Explain the purpose of this flag..." rows="2"></textarea>
+</div>
+</div>
+</section>
+<!-- 2. Variation Type -->
+<section class="stagger-card bg-white border border-secondary-container p-stack-md rounded-xl" style="animation-delay: 160ms;">
+<h3 class="font-title-lg text-title-lg text-primary mb-stack-md">Variation Type</h3>
+<div class="grid grid-cols-2 gap-stack-sm">
+<div class="type-card cursor-pointer border-2 border-secondary-container bg-secondary-container/10 p-3 rounded-lg hover:border-secondary transition-all" id="type-boolean" onclick="setType('boolean')">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary">toggle_on</span>
+<span class="font-label-md text-label-md">Boolean</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">True or False toggle</p>
+</div>
+<div class="type-card cursor-pointer border-2 border-transparent bg-background p-3 rounded-lg hover:border-secondary-container transition-all" id="type-string" onclick="setType('string')">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary">short_text</span>
+<span class="font-label-md text-label-md">String</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Plain text values</p>
+</div>
+<div class="type-card cursor-pointer border-2 border-transparent bg-background p-3 rounded-lg hover:border-secondary-container transition-all" id="type-number" onclick="setType('number')">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary">123</span>
+<span class="font-label-md text-label-md">Number</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Numeric variations</p>
+</div>
+<div class="type-card cursor-pointer border-2 border-transparent bg-background p-3 rounded-lg hover:border-secondary-container transition-all" id="type-json" onclick="setType('json')">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary">data_object</span>
+<span class="font-label-md text-label-md">JSON</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Structured data</p>
+</div>
+</div>
+</section>
+<!-- 3. Initial Rollout -->
+<section class="stagger-card bg-white border border-secondary-container p-stack-md rounded-xl" style="animation-delay: 240ms;">
+<div class="flex justify-between items-center mb-stack-md">
+<h3 class="font-title-lg text-title-lg text-primary">Initial Rollout</h3>
+<span class="font-code-md text-[20px] text-secondary font-bold" id="rolloutValue">10%</span>
+</div>
+<div class="space-y-6">
+<input class="w-full h-2 bg-secondary-container rounded-lg appearance-none cursor-pointer" id="rolloutSlider" max="100" min="0" oninput="updateRollout(this.value)" type="range" value="10"/>
+<div class="flex gap-2">
+<button class="flex-1 py-1 font-label-md text-label-md border border-outline-variant rounded hover:bg-background transition-colors" onclick="updateRollout(0)">0%</button>
+<button class="flex-1 py-1 font-label-md text-label-md border border-outline-variant rounded hover:bg-background transition-colors" onclick="updateRollout(10)">10%</button>
+<button class="flex-1 py-1 font-label-md text-label-md border border-outline-variant rounded hover:bg-background transition-colors" onclick="updateRollout(50)">50%</button>
+<button class="flex-1 py-1 font-label-md text-label-md border border-outline-variant rounded hover:bg-background transition-colors" onclick="updateRollout(100)">100%</button>
+</div>
+<div class="flex items-center gap-2 p-3 bg-primary-fixed/30 rounded-lg">
+<span class="material-symbols-outlined text-secondary">analytics</span>
+<p class="text-[13px] text-on-primary-fixed-variant" id="rolloutStatus">
+                                This flag will be active for 10% of users based on consistent hashing.
+                            </p>
+</div>
+</div>
+</section>
+<!-- 4. Initial State -->
+<section class="stagger-card bg-white border border-secondary-container p-stack-md rounded-xl" style="animation-delay: 320ms;">
+<h3 class="font-title-lg text-title-lg text-primary mb-stack-md">Initial State</h3>
+<div class="grid grid-cols-2 gap-stack-sm">
+<div class="state-card cursor-pointer border-2 border-secondary-container bg-secondary-container/10 p-4 rounded-lg flex items-center gap-3 transition-all" id="state-enabled" onclick="setState(true)">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">bolt</span>
+</div>
+<div>
+<span class="font-label-md text-label-md block">Enabled</span>
+<p class="text-[12px] text-on-surface-variant">Flag is live immediately</p>
+</div>
+</div>
+<div class="state-card cursor-pointer border-2 border-transparent bg-background p-4 rounded-lg flex items-center gap-3 transition-all" id="state-disabled" onclick="setState(false)">
+<div class="w-10 h-10 rounded-full bg-outline-variant/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">block</span>
+</div>
+<div>
+<span class="font-label-md text-label-md block">Disabled</span>
+<p class="text-[12px] text-on-surface-variant">Evaluation returns default</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Sidebar -->
+<aside class="w-full lg:w-[320px] space-y-stack-md">
+<!-- Live Preview -->
+<div class="sticky top-stack-md space-y-stack-md">
+<section class="bg-primary-container p-stack-md rounded-xl shadow-lg">
+<div class="flex items-center justify-between mb-4 border-b border-primary pb-2">
+<h3 class="font-label-md text-label-md text-secondary-container uppercase tracking-wider">Live Preview</h3>
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+</div>
+<div class="mono-font text-[13px] text-secondary-container leading-relaxed">
+<pre class="whitespace-pre-wrap" id="json-preview">{
+  "key": "<span class="transition-all duration-300" id="p-key">new-user-dashboard</span>",
+  "name": "<span class="transition-all duration-300" id="p-name"></span>",
+  "type": "<span class="transition-all duration-300" id="p-type">boolean</span>",
+  "enabled": <span class="transition-all duration-300" id="p-enabled">true</span>,
+  "rollout": <span class="transition-all duration-300" id="p-rollout">10</span>
+}</pre>
+</div>
+</section>
+<!-- API Hint -->
+<section class="bg-tertiary p-stack-md rounded-xl">
+<h4 class="font-label-md text-label-md text-tertiary-fixed mb-2 uppercase">Usage Endpoint</h4>
+<div class="bg-black/20 p-2 rounded border border-white/10 flex items-center justify-between">
+<code class="font-code-md text-[12px] text-tertiary-fixed-dim">POST /api/v1/eval/...</code>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[16px] cursor-pointer hover:text-white">content_copy</span>
+</div>
+</section>
+<!-- Tips -->
+<section class="bg-white border border-secondary-container p-stack-md rounded-xl">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-secondary">lightbulb</span>
+<h4 class="font-title-lg text-title-lg text-primary">Canopy Tips</h4>
+</div>
+<ul class="space-y-3">
+<li class="flex gap-3 text-body-md text-on-surface-variant">
+<span class="text-secondary font-bold">•</span>
+                                Use clear, action-oriented names like "enable-beta-header".
+                            </li>
+<li class="flex gap-3 text-body-md text-on-surface-variant">
+<span class="text-secondary font-bold">•</span>
+                                Stick to Boolean if you just need a simple on/off switch.
+                            </li>
+<li class="flex gap-3 text-body-md text-on-surface-variant">
+<span class="text-secondary font-bold">•</span>
+                                10% Rollout is recommended for initial canary testing.
+                            </li>
+</ul>
+</section>
+<div class="h-[200px] w-full rounded-xl overflow-hidden relative group">
+<div class="absolute inset-0 bg-primary/20 flex items-center justify-center pointer-events-none z-10">
+<span class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-primary font-label-md shadow-sm">Visualizing Logic</span>
+</div>
+
+</div>
+</div>
+</aside>
+</main>
+</div>
+<script>
+        const state = {
+            name: "",
+            key: "new-user-dashboard",
+            type: "boolean",
+            enabled: true,
+            rollout: 10
+        };
+
+        function syncSlug(val) {
+            const keyEl = document.getElementById('flagKey');
+            const previewKey = document.getElementById('p-key');
+            const previewName = document.getElementById('p-name');
+            
+            state.name = val;
+            state.key = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            
+            if (state.key === "") state.key = "flag-key-preview";
+            
+            keyEl.textContent = state.key;
+            keyEl.classList.remove('animate-flash');
+            void keyEl.offsetWidth; // Trigger reflow
+            keyEl.classList.add('animate-flash');
+            
+            previewName.textContent = state.name;
+            previewKey.textContent = state.key;
+            highlightPreview('p-name');
+            highlightPreview('p-key');
+
+            // Reset error if valid
+            if (val.trim() !== "") {
+                document.getElementById('flagName').classList.remove('border-error');
+                document.getElementById('nameError').classList.add('hidden');
+            }
+        }
+
+        function setType(type) {
+            state.type = type;
+            document.querySelectorAll('.type-card').forEach(card => {
+                card.classList.remove('border-secondary', 'bg-secondary-container/10');
+                card.classList.add('border-transparent', 'bg-background');
+            });
+            const active = document.getElementById(`type-${type}`);
+            active.classList.remove('border-transparent', 'bg-background');
+            active.classList.add('border-secondary', 'bg-secondary-container/10');
+            
+            document.getElementById('p-type').textContent = type;
+            highlightPreview('p-type');
+        }
+
+        function setState(enabled) {
+            state.enabled = enabled;
+            document.querySelectorAll('.state-card').forEach(card => {
+                card.classList.remove('border-secondary', 'bg-secondary-container/10');
+                card.classList.add('border-transparent', 'bg-background');
+            });
+            const active = document.getElementById(`state-${enabled ? 'enabled' : 'disabled'}`);
+            active.classList.remove('border-transparent', 'bg-background');
+            active.classList.add('border-secondary', 'bg-secondary-container/10');
+            
+            document.getElementById('p-enabled').textContent = enabled;
+            highlightPreview('p-enabled');
+        }
+
+        function updateRollout(val) {
+            state.rollout = val;
+            const valEl = document.getElementById('rolloutValue');
+            const slider = document.getElementById('rolloutSlider');
+            const statusEl = document.getElementById('rolloutStatus');
+            const previewRollout = document.getElementById('p-rollout');
+            
+            valEl.textContent = val + '%';
+            slider.value = val;
+            valEl.classList.remove('animate-pulse-scale');
+            void valEl.offsetWidth;
+            valEl.classList.add('animate-pulse-scale');
+            
+            statusEl.textContent = val == 0 ? "Flag is completely hidden from all users." : 
+                                  val == 100 ? "Flag is rolled out to 100% of your user base." : 
+                                  `This flag will be active for ${val}% of users based on consistent hashing.`;
+            
+            previewRollout.textContent = val;
+            highlightPreview('p-rollout');
+        }
+
+        function highlightPreview(id) {
+            const el = document.getElementById(id);
+            el.classList.add('highlight-change');
+            setTimeout(() => el.classList.remove('highlight-change'), 500);
+        }
+
+        function handleCreate() {
+            const nameInput = document.getElementById('flagName');
+            if (state.name.trim() === "") {
+                nameInput.classList.add('border-error');
+                document.getElementById('nameError').classList.remove('hidden');
+                nameInput.focus();
+                return;
+            }
+
+            const btn = document.getElementById('createBtn');
+            btn.classList.add('loading-state');
+            
+            // Mock success
+            setTimeout(() => {
+                btn.classList.remove('loading-state');
+                alert(`Flag "${state.name}" created successfully!`);
+            }, 2000);
+        }
+
+        // Initialize preview
+        syncSlug("");
+    </script>
+</body></html>
