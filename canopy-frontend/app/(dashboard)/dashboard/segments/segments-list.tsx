@@ -32,6 +32,12 @@ export default function SegmentsList({ initialSegments, token }: SegmentsListPro
   const [detailedSegment, setDetailedSegment] = useState<Segment | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
+  // New rule form states
+  const [newRuleAttr, setNewRuleAttr] = useState("");
+  const [newRuleOp, setNewRuleOp] = useState<"EQUALS" | "NOT_EQUALS" | "CONTAINS" | "NOT_CONTAINS" | "STARTS_WITH" | "ENDS_WITH">("EQUALS");
+  const [newRuleVal, setNewRuleVal] = useState("");
+  const [addingRule, setAddingRule] = useState(false);
+
   const filteredSegments = segments.filter(
     (seg) =>
       seg.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -94,6 +100,143 @@ export default function SegmentsList({ initialSegments, token }: SegmentsListPro
       setDrawerOpen(false);
     } finally {
       setLoadingDetail(false);
+    }
+  };
+
+  const handleDeleteRule = async (ruleId: string) => {
+    if (!detailedSegment) return;
+    
+    // Check if it's the last rule
+    if (detailedSegment.rules && detailedSegment.rules.length <= 1) {
+      toast.error("A segment must have at least one targeting rule.");
+      return;
+    }
+
+    const originalRules = detailedSegment.rules;
+    const updatedRules = originalRules.filter((r) => r.ruleId !== ruleId);
+
+    // Optimistic UI updates
+    setDetailedSegment({
+      ...detailedSegment,
+      rules: updatedRules,
+    });
+
+    setSegments((prev) =>
+      prev.map((s) => {
+        if (s.segmentId === detailedSegment.segmentId) {
+          return {
+            ...s,
+            rules: updatedRules,
+          };
+        }
+        return s;
+      })
+    );
+
+    if (!token) {
+      toast.success("Mock: Rule removed");
+      return;
+    }
+
+    try {
+      await segmentsApi.deleteRule(detailedSegment.segmentId, ruleId, token);
+      toast.success("Rule removed successfully");
+    } catch (err: any) {
+      // Revert states
+      setDetailedSegment({
+        ...detailedSegment,
+        rules: originalRules,
+      });
+      setSegments((prev) =>
+        prev.map((s) => {
+          if (s.segmentId === detailedSegment.segmentId) {
+            return {
+              ...s,
+              rules: originalRules,
+            };
+          }
+          return s;
+        })
+      );
+      toast.error(err.message || "Failed to remove rule");
+    }
+  };
+
+  const handleAddRule = async () => {
+    if (!detailedSegment) return;
+    if (!newRuleAttr.trim() || !newRuleVal.trim()) {
+      toast.error("Rule attribute and value are required.");
+      return;
+    }
+
+    setAddingRule(true);
+
+    const newRulePayload = {
+      attribute: newRuleAttr.trim(),
+      operator: newRuleOp,
+      value: newRuleVal.trim(),
+    };
+
+    if (!token) {
+      setTimeout(() => {
+        const mockRule = {
+          ruleId: Math.random().toString(),
+          segmentId: detailedSegment.segmentId,
+          ...newRulePayload,
+        };
+        const updatedRules = [...(detailedSegment.rules || []), mockRule];
+
+        setDetailedSegment({
+          ...detailedSegment,
+          rules: updatedRules,
+        });
+
+        setSegments((prev) =>
+          prev.map((s) => {
+            if (s.segmentId === detailedSegment.segmentId) {
+              return {
+                ...s,
+                rules: updatedRules,
+              };
+            }
+            return s;
+          })
+        );
+
+        setNewRuleAttr("");
+        setNewRuleVal("");
+        setAddingRule(false);
+        toast.success("Mock: Rule added successfully");
+      }, 500);
+      return;
+    }
+
+    try {
+      await segmentsApi.addRule(detailedSegment.segmentId, newRulePayload, token);
+
+      // Fetch the updated segment to display the complete list with newly generated IDs
+      const updated = await segmentsApi.getOne(detailedSegment.segmentId, token);
+      setDetailedSegment(updated);
+
+      setSegments((prev) =>
+        prev.map((s) => {
+          if (s.segmentId === detailedSegment.segmentId) {
+            return {
+              ...s,
+              rules: updated.rules,
+            };
+          }
+          return s;
+        })
+      );
+
+      setNewRuleAttr("");
+      setNewRuleVal("");
+      toast.success("Rule added successfully");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to add rule");
+    } finally {
+      setAddingRule(false);
     }
   };
 
@@ -259,23 +402,88 @@ export default function SegmentsList({ initialSegments, token }: SegmentsListPro
                 {detailedSegment.rules && detailedSegment.rules.length > 0 ? (
                   <div className="space-y-2">
                     {detailedSegment.rules.map((rule, idx) => (
-                      <div key={rule.ruleId} className="flex items-center gap-2 text-xs bg-gray-50 border border-canopy-border/10 p-2.5 rounded-lg">
-                        <span className="text-[10px] font-bold text-canopy-text/30 bg-gray-200/50 w-5 h-5 rounded-full flex items-center justify-center">
-                          {idx + 1}
-                        </span>
-                        <span className="font-mono bg-white border border-canopy-border/20 px-1.5 py-0.5 rounded font-semibold text-gray-700">
-                          {rule.attribute}
-                        </span>
-                        <span className="font-semibold text-amber-700 uppercase text-[10px]">{rule.operator}</span>
-                        <span className="font-mono bg-white border border-canopy-border/20 px-1.5 py-0.5 rounded font-semibold text-gray-700">
-                          "{rule.value}"
-                        </span>
+                      <div key={rule.ruleId} className="flex items-center justify-between gap-2 text-xs bg-gray-50 border border-canopy-border/10 p-2.5 rounded-lg group/rule">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-canopy-text/30 bg-gray-200/50 w-5 h-5 rounded-full flex items-center justify-center">
+                            {idx + 1}
+                          </span>
+                          <span className="font-mono bg-white border border-canopy-border/20 px-1.5 py-0.5 rounded font-semibold text-gray-700">
+                            {rule.attribute}
+                          </span>
+                          <span className="font-semibold text-amber-700 uppercase text-[10px]">{rule.operator}</span>
+                          <span className="font-mono bg-white border border-canopy-border/20 px-1.5 py-0.5 rounded font-semibold text-gray-700">
+                            "{rule.value}"
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteRule(rule.ruleId)}
+                          className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 opacity-0 group-hover/rule:opacity-100 focus:opacity-100 transition-opacity cursor-pointer border-none bg-transparent"
+                          title="Delete rule"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-xs text-canopy-text/45 italic">No targeting rules configured for this segment.</div>
                 )}
+
+                {/* Inline Add Rule Form */}
+                <div className="mt-3 p-3 bg-[#f7f7f2] border border-dashed border-canopy-border/20 rounded-lg space-y-3">
+                  <div className="text-[10px] font-bold text-[#1c3a2f] uppercase tracking-wider">Add New Rule</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[9px] font-bold text-canopy-text/50 uppercase tracking-wider block mb-1">Attribute</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. email"
+                        value={newRuleAttr}
+                        onChange={(e) => setNewRuleAttr(e.target.value)}
+                        className="w-full text-xs p-1.5 bg-white border border-canopy-border/20 rounded focus:outline-none focus:border-[#1c3a2f] text-canopy-text"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-bold text-canopy-text/50 uppercase tracking-wider block mb-1">Operator</label>
+                      <select
+                        value={newRuleOp}
+                        onChange={(e) => setNewRuleOp(e.target.value as any)}
+                        className="w-full text-xs p-1.5 bg-white border border-canopy-border/20 rounded focus:outline-none focus:border-[#1c3a2f] text-canopy-text"
+                      >
+                        <option value="EQUALS">EQUALS</option>
+                        <option value="NOT_EQUALS">NOT EQUALS</option>
+                        <option value="CONTAINS">CONTAINS</option>
+                        <option value="NOT_CONTAINS">NOT CONTAINS</option>
+                        <option value="STARTS_WITH">STARTS WITH</option>
+                        <option value="ENDS_WITH">ENDS WITH</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-canopy-text/50 uppercase tracking-wider block mb-1">Value</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. beta"
+                        value={newRuleVal}
+                        onChange={(e) => setNewRuleVal(e.target.value)}
+                        className="flex-1 text-xs p-1.5 bg-white border border-canopy-border/20 rounded focus:outline-none focus:border-[#1c3a2f] text-canopy-text"
+                      />
+                      <button
+                        onClick={handleAddRule}
+                        disabled={addingRule}
+                        className="bg-[#1c3a2f] text-white hover:bg-[#152c24] text-xs font-bold px-3 py-1.5 rounded active:scale-95 transition-all disabled:opacity-50 flex items-center gap-1 cursor-pointer border-none outline-none"
+                      >
+                        {addingRule ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Plus className="w-3.5 h-3.5 text-[#6ee7b7]" />
+                        )}
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Linked Feature Flags */}
