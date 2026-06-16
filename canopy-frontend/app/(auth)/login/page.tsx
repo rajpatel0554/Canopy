@@ -99,9 +99,9 @@ export default function LoginPage() {
         {/* Left Marketing Panel */}
         <section className="lp p-10 flex flex-col justify-between text-white relative">
           
-          <div className="animate-fade-up">
+          <div>
             {/* Top Branding */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 opacity-0 animate-fade-up">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(110, 231, 183, 0.18)" }}>
                 <span className="material-symbols-outlined" style={{ color: "#6ee7b7", fontSize: "20px" }}>eco</span>
               </div>
@@ -110,27 +110,33 @@ export default function LoginPage() {
 
             {/* Main Text Content */}
             <div className="mt-12">
-              <h1 className="text-5xl leading-tight mb-6 font-serif">
+              <h1 className="text-5xl leading-tight mb-6 font-serif opacity-0 animate-fade-up delay-100">
                 Ship faster.<br />
                 Stay in control.
               </h1>
-              <p className="text-gray-300 text-lg mb-10 max-w-xs leading-relaxed">
+              <p className="text-gray-300 text-lg mb-10 max-w-xs leading-relaxed opacity-0 animate-fade-up delay-200">
                 Feature flags, A/B tests, and targeting rules — all in one place for your team.
               </p>
               
               {/* Feature Feature Feature Feature Feature Feature Pills */}
               <div className="space-y-4">
-                <div className="pill-feature animate-pill-float" style={{ animationDelay: "0s" }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>toggle_on</span>
-                  <span className="text-sm font-medium">Instant flag toggles</span>
+                <div className="opacity-0 animate-fade-up delay-300">
+                  <div className="pill-feature animate-pill-float" style={{ animationDelay: "0s" }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>toggle_on</span>
+                    <span className="text-sm font-medium">Instant flag toggles</span>
+                  </div>
                 </div>
-                <div className="pill-feature animate-pill-float" style={{ animationDelay: "0.2s" }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>science</span>
-                  <span className="text-sm font-medium">A/B testing built-in</span>
+                <div className="opacity-0 animate-fade-up delay-400">
+                  <div className="pill-feature animate-pill-float" style={{ animationDelay: "0.2s" }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>science</span>
+                    <span className="text-sm font-medium">A/B testing built-in</span>
+                  </div>
                 </div>
-                <div className="pill-feature animate-pill-float" style={{ animationDelay: "0.4s" }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>groups</span>
-                  <span className="text-sm font-medium">Multi-tenant ready</span>
+                <div className="opacity-0 animate-fade-up delay-500">
+                  <div className="pill-feature animate-pill-float" style={{ animationDelay: "0.4s" }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>groups</span>
+                    <span className="text-sm font-medium">Multi-tenant ready</span>
+                  </div>
                 </div>
               </div>
             </div>

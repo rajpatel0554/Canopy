@@ -178,9 +178,9 @@ export default function RegisterPage() {
 
         {/* LEFT PANEL (Marketing) */}
         <section className="lp p-8 md:p-12 flex flex-col justify-between text-white relative">
-          <div className="animate-fade-up">
+          <div>
             {/* Logo */}
-            <div className="flex items-center gap-3 mb-16">
+            <div className="flex items-center gap-3 mb-16 opacity-0 animate-fade-up">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(110, 231, 183, 0.18)" }}>
                 <span className="material-symbols-outlined" style={{ color: "#6ee7b7", fontSize: "20px" }}>eco</span>
               </div>
@@ -188,30 +188,37 @@ export default function RegisterPage() {
             </div>
             {/* Headline & Subtitle */}
             <div className="mb-12">
-              <h1 className="text-4xl md:text-5xl leading-[1.1] mb-6 font-serif">
+              <h1 className="text-4xl md:text-5xl leading-[1.1] mb-6 font-serif opacity-0 animate-fade-up delay-100">
                 <span className="block">Ship faster.</span>
                 <span className="block">Stay in control.</span>
               </h1>
-              <p className="text-gray-300 text-lg leading-relaxed max-w-sm">
+              <p className="text-gray-300 text-lg leading-relaxed max-w-sm opacity-0 animate-fade-up delay-200">
                 Feature flags, A/B tests, and targeting rules — all in one place for your team.
               </p>
             </div>
             {/* Feature Pills */}
             <div className="space-y-4">
-              <div className="pill-feature px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-pill-float" style={{ animationDelay: "0s" }}>
-                <span className="material-symbols-outlined text-mint text-xl">radio_button_checked</span>
-                <span className="font-medium text-mint">Instant flag toggles</span>
+              <div className="opacity-0 animate-fade-up delay-300">
+                <div className="pill-feature px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-pill-float" style={{ animationDelay: "0s" }}>
+                  <span className="material-symbols-outlined text-mint text-xl">radio_button_checked</span>
+                  <span className="font-medium text-mint">Instant flag toggles</span>
+                </div>
               </div>
-              <div className="pill-feature px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-pill-float" style={{ animationDelay: "0.2s" }}>
-                <span className="material-symbols-outlined text-mint text-xl">biotech</span>
-                <span className="font-medium text-mint">A/B testing built-in</span>
+              <div className="opacity-0 animate-fade-up delay-400">
+                <div className="pill-feature px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-pill-float" style={{ animationDelay: "0.2s" }}>
+                  <span className="material-symbols-outlined text-mint text-xl">biotech</span>
+                  <span className="font-medium text-mint">A/B testing built-in</span>
+                </div>
               </div>
-              <div className="pill-feature px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-pill-float" style={{ animationDelay: "0.4s" }}>
-                <span className="material-symbols-outlined text-mint text-xl">groups</span>
-                <span className="font-medium text-mint">Multi-tenant ready</span>
+              <div className="opacity-0 animate-fade-up delay-500">
+                <div className="pill-feature px-5 py-3 rounded-full flex items-center gap-3 w-fit animate-pill-float" style={{ animationDelay: "0.4s" }}>
+                  <span className="material-symbols-outlined text-mint text-xl">groups</span>
+                  <span className="font-medium text-mint">Multi-tenant ready</span>
+                </div>
               </div>
             </div>
           </div>
+
           {/* Footer Branding */}
           <footer className="mt-12 text-sm text-gray-500 flex items-center gap-2">
             <span>🌿 Portfolio project · Raj Patel</span>
