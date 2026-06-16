@@ -90,7 +90,7 @@ export const tenantsApi = {
 };
 
 // ── Feature Flags ─────────────────────────────────────────────────────────────
-import type { Flag, CreateFlagPayload, UpdateFlagPayload } from "@/types";
+import type { Flag, CreateFlagPayload, UpdateFlagPayload, FlagVariation, FlagSegment } from "@/types";
 
 export const flagsApi = {
   getAll: (token: string) =>
@@ -120,6 +120,12 @@ export const flagsApi = {
     apiFetch<void>(`/api/flags/${flagKey}`, {
       method: "DELETE",
     }, token),
+
+  getVariations: (flagKey: string, token: string) =>
+    apiFetch<FlagVariation[]>(`/api/flags/${flagKey}/variations`, {}, token),
+
+  getAttachedSegments: (flagKey: string, token: string) =>
+    apiFetch<FlagSegment[]>(`/api/flags/${flagKey}/segments`, {}, token),
 };
 
 // ── Targeting Rules ───────────────────────────────────────────────────────────
@@ -177,10 +183,10 @@ export const segmentsApi = {
       method: "DELETE",
     }, token),
 
-  attachToFlag: (flagKey: string, segmentId: string, token: string) =>
+  attachToFlag: (flagKey: string, segmentId: string, variationId: string | null, token: string) =>
     apiFetch<void>(`/api/flags/${flagKey}/segments`, {
       method: "POST",
-      body: JSON.stringify({ segmentId }),
+      body: JSON.stringify({ segmentId, variationId }),
     }, token),
 
   detachFromFlag: (flagKey: string, segmentId: string, token: string) =>

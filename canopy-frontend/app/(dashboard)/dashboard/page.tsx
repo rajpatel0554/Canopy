@@ -9,6 +9,7 @@ export default async function DashboardPage() {
   const displayName = userName.charAt(0).toUpperCase() + userName.slice(1);
   const token = session?.user ? (session.user as any).token : undefined;
 
+  const now = Date.now();
   let totalFlagsCount = 0;
   let activeFlagsCount = 0;
   let segmentsCount = 0;
@@ -33,7 +34,7 @@ export default async function DashboardPage() {
       if (sortedFlags.length > 0) {
         activities = sortedFlags.slice(0, 3).map((f) => {
           const createdDate = new Date(f.createdAt);
-          const diffMs = Date.now() - createdDate.getTime();
+          const diffMs = now - createdDate.getTime();
           const diffMins = Math.floor(diffMs / 60000);
           const diffHrs = Math.floor(diffMins / 60);
           const diffDays = Math.floor(diffHrs / 24);

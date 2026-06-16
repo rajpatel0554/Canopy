@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,13 @@ public class SegmentService {
     // ── Segment CRUD ───────────────────────────────────────────────────────
 
     public List<Segment> getAllSegments() {
-        return segmentRepository.findAll();
+        List<Segment> segments = segmentRepository.findAll();
+        java.util.Map<UUID, Integer> counts = segmentRepository.getFlagsCountPerSegment();
+        for (Segment seg : segments) {
+            seg.setRules(segmentRepository.findRulesBySegmentId(seg.getSegmentId()));
+            seg.setFlagsCount(counts.getOrDefault(seg.getSegmentId(), 0));
+        }
+        return segments;
     }
 
     public Segment getSegmentById(UUID segmentId) {
@@ -27,8 +34,9 @@ public class SegmentService {
                 .orElseThrow(() -> new RuntimeException(
                         "Segment not found: " + segmentId
                 ));
-        // Load rules and attach them to the segment object
         segment.setRules(segmentRepository.findRulesBySegmentId(segmentId));
+        segment.setFlagsCount(segmentRepository.countFlagsLinkedToSegment(segmentId));
+        segment.setLinkedFlags(segmentRepository.findLinkedFlagsBySegmentId(segmentId));
         return segment;
     }
 
@@ -113,5 +121,28 @@ public class SegmentService {
                         "Flag not found: " + flagKey
                 ));
         segmentRepository.detachSegmentFromFlag(flag.getFlagId(), segmentId);
+    }
+
+    public List<FlagSegmentResponse> getAttachedSegmentsForFlag(String flagKey) {
+        Flag flag = flagRepository.findByKey(flagKey)
+                .orElseThrow(() -> new RuntimeException("Flag not found: " + flagKey));
+        
+        List<java.util.Map<String, Object>> rawRows = segmentRepository.findAttachedSegmentsRawByFlagId(flag.getFlagId());
+        
+        return rawRows.stream().map(row -> {
+            UUID segmentId = UUID.fromString((String) row.get("segmentId"));
+            List<SegmentRule> rules = segmentRepository.findRulesBySegmentId(segmentId);
+            
+            String rawVariationId = (String) row.get("variationId");
+            UUID variationId = rawVariationId != null ? UUID.fromString(rawVariationId) : null;
+            
+            return FlagSegmentResponse.builder()
+                    .segmentId(segmentId)
+                    .name((String) row.get("name"))
+                    .description((String) row.get("description"))
+                    .rules(rules)
+                    .variationId(variationId)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

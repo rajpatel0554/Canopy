@@ -11,19 +11,24 @@ import {
   Zap,
   Ban,
   Activity,
-  ToggleLeft
+  ToggleLeft,
+  Sliders,
+  Layers,
+  X,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
-import { flagsApi } from "@/lib/api";
-import type { Flag } from "@/types";
+import { flagsApi, segmentsApi } from "@/lib/api";
+import type { Flag, Segment, FlagVariation } from "@/types";
 
 interface FlagsListProps {
   initialFlags: Flag[];
   token?: string;
-  segmentsCount?: number;
+  initialSegments?: Segment[];
 }
 
-export default function FlagsList({ initialFlags, token, segmentsCount = 0 }: FlagsListProps) {
+export default function FlagsList({ initialFlags, token, initialSegments = [] }: FlagsListProps) {
+  const segmentsCount = initialSegments.length;
   const [flags, setFlags] = useState<Flag[]>(initialFlags);
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -34,6 +39,76 @@ export default function FlagsList({ initialFlags, token, segmentsCount = 0 }: Fl
   const [sortBy, setSortBy] = useState<"LATEST" | "KEY">("LATEST");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [flashingFlag, setFlashingFlag] = useState<{ key: string; isMint: boolean } | null>(null);
+
+  // Attach Segment states
+  const [selectedFlag, setSelectedFlag] = useState<Flag | null>(null);
+  const [isAttachModalOpen, setIsAttachModalOpen] = useState(false);
+  const [selectedSegmentId, setSelectedSegmentId] = useState("");
+  const [selectedVariationId, setSelectedVariationId] = useState("");
+  const [variations, setVariations] = useState<FlagVariation[]>([]);
+  const [loadingVariations, setLoadingVariations] = useState(false);
+  const [attaching, setAttaching] = useState(false);
+
+  const handleOpenAttachModal = async (flag: Flag) => {
+    setActiveDropdown(null);
+    setSelectedFlag(flag);
+    setIsAttachModalOpen(true);
+    setLoadingVariations(true);
+
+    if (!token) {
+      // Mock variations fallback
+      const mockVariations = [
+        { variationId: "v1", flagId: flag.flagId, value: "true", isDefault: false },
+        { variationId: "v2", flagId: flag.flagId, value: "false", isDefault: true }
+      ];
+      setVariations(mockVariations);
+      setSelectedVariationId(mockVariations[0].variationId);
+      setLoadingVariations(false);
+      return;
+    }
+
+    try {
+      const vars = await flagsApi.getVariations(flag.key, token);
+      setVariations(vars);
+      if (vars.length > 0) {
+        setSelectedVariationId(vars[0].variationId);
+      }
+    } catch (err) {
+      toast.error("Failed to load variations for flag");
+    } finally {
+      setLoadingVariations(false);
+    }
+  };
+
+  const handleAttachSegment = async () => {
+    if (!selectedFlag || !selectedSegmentId) {
+      toast.error("Please select a segment");
+      return;
+    }
+
+    setAttaching(true);
+
+    if (!token) {
+      toast.success("Mock: Segment attached to flag successfully");
+      setIsAttachModalOpen(false);
+      setSelectedSegmentId("");
+      setSelectedFlag(null);
+      setAttaching(false);
+      return;
+    }
+
+    try {
+      await segmentsApi.attachToFlag(selectedFlag.key, selectedSegmentId, selectedVariationId || null, token);
+      toast.success(`Segment successfully attached to flag "${selectedFlag.name}"`);
+      setIsAttachModalOpen(false);
+      setSelectedSegmentId("");
+      setSelectedFlag(null);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to attach segment");
+    } finally {
+      setAttaching(false);
+    }
+  };
 
   const handleToggleClick = (flagKey: string, currentEnabled: boolean) => {
     setRipplingFlag(flagKey);
@@ -290,14 +365,18 @@ export default function FlagsList({ initialFlags, token, segmentsCount = 0 }: Fl
                       }`}
                     >
                       <td className="px-5 py-4">
-                        <span className="font-mono text-xs bg-[#e8f5ee] text-[#1c3a2f] border border-[#d1fae5] px-2 py-1 rounded select-all font-semibold max-w-[170px] truncate inline-block">
-                          {flag.key}
-                        </span>
+                        <Link href={`/dashboard/flags/${flag.key}`} className="hover:opacity-85 transition-opacity">
+                          <span className="font-mono text-xs bg-[#e8f5ee] text-[#1c3a2f] border border-[#d1fae5] px-2 py-1 rounded select-all font-semibold max-w-[170px] truncate inline-block">
+                            {flag.key}
+                          </span>
+                        </Link>
                       </td>
                       
                       <td className="px-5 py-4">
                         <div className="max-w-[280px]">
-                          <p className="text-[13.5px] font-semibold text-[#1c3a2f] truncate">{flag.name}</p>
+                          <Link href={`/dashboard/flags/${flag.key}`} className="hover:underline">
+                            <p className="text-[13.5px] font-semibold text-[#1c3a2f] truncate">{flag.name}</p>
+                          </Link>
                           <p className="text-xs text-canopy-text/60 truncate mt-0.5" title={flag.description || ""}>
                             {flag.description || "No description provided"}
                           </p>
@@ -372,7 +451,22 @@ export default function FlagsList({ initialFlags, token, segmentsCount = 0 }: Fl
                         
                         {/* Dropdown Options Menu */}
                         {activeDropdown === flag.key && (
-                          <div className="absolute right-12 top-1/2 -translate-y-1/2 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20 text-left animate-in fade-in duration-150">
+                          <div className="absolute right-12 top-1/2 -translate-y-1/2 w-40 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20 text-left animate-in fade-in duration-150">
+                            <Link
+                              href={`/dashboard/flags/${flag.key}`}
+                              className="w-full px-3 py-2 text-xs font-bold text-canopy-text hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                            >
+                              <Sliders className="w-3.5 h-3.5" />
+                              View Details
+                            </Link>
+                            <button
+                              onClick={() => handleOpenAttachModal(flag)}
+                              className="w-full px-3 py-2 text-xs font-bold text-canopy-text hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                            >
+                              <Layers className="w-3.5 h-3.5" />
+                              Attach Segment
+                            </button>
+                            <div className="border-t border-canopy-border/10 my-1" />
                             <button
                               onClick={() => {
                                 if (confirm(`Are you sure you want to delete feature flag "${flag.name}"?`)) {
@@ -401,6 +495,92 @@ export default function FlagsList({ initialFlags, token, segmentsCount = 0 }: Fl
           </table>
         </div>
       </div>
+
+      {/* Attach Segment Modal */}
+      {isAttachModalOpen && selectedFlag && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-canopy-border/15 rounded-xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-5 py-4 border-b border-canopy-border/10 flex justify-between items-center bg-[#f7f7f2]/40">
+              <h3 className="font-bold text-sm text-[#1c3a2f]">Attach Segment to {selectedFlag.name}</h3>
+              <button 
+                onClick={() => {
+                  setIsAttachModalOpen(false);
+                  setSelectedSegmentId("");
+                  setSelectedFlag(null);
+                }}
+                className="text-canopy-text/40 hover:text-canopy-text transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10.5px] font-bold text-canopy-text/60 uppercase">Targeting Segment</label>
+                <select
+                  value={selectedSegmentId}
+                  onChange={(e) => setSelectedSegmentId(e.target.value)}
+                  className="p-2 border border-canopy-border/20 rounded-lg text-xs bg-white focus:outline-none focus:border-[#1c3a2f] font-semibold text-canopy-text/80 cursor-pointer"
+                >
+                  <option value="">-- Select a Segment --</option>
+                  {initialSegments
+                    .map(s => (
+                      <option key={s.segmentId} value={s.segmentId}>
+                        {s.name} ({s.rules?.length || 0} rules)
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10.5px] font-bold text-canopy-text/60 uppercase">Served Variation</label>
+                {loadingVariations ? (
+                  <div className="p-2 text-xs text-canopy-text/50 flex items-center gap-1.5">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Loading variations...
+                  </div>
+                ) : (
+                  <select
+                    value={selectedVariationId}
+                    onChange={(e) => setSelectedVariationId(e.target.value)}
+                    className="p-2 border border-canopy-border/20 rounded-lg text-xs bg-white focus:outline-none focus:border-[#1c3a2f] font-semibold text-canopy-text/80 cursor-pointer"
+                  >
+                    {variations.map(v => (
+                      <option key={v.variationId} value={v.variationId}>
+                        {v.value} {v.isDefault ? "(default)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="text-[10px] text-canopy-text/50">
+                  Users matching all of this segment's rules will be served this variation value.
+                </p>
+              </div>
+            </div>
+
+            <div className="px-5 py-3.5 border-t border-canopy-border/10 bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setIsAttachModalOpen(false);
+                  setSelectedSegmentId("");
+                  setSelectedFlag(null);
+                }}
+                className="px-4 py-2 border border-canopy-border/25 rounded-lg text-xs font-semibold text-canopy-text hover:bg-gray-100 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAttachSegment}
+                disabled={attaching || !selectedSegmentId || loadingVariations}
+                className="px-4 py-2 bg-[#1c3a2f] text-white hover:bg-[#152c24] text-xs font-semibold rounded-lg flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {attaching && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Attach Segment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

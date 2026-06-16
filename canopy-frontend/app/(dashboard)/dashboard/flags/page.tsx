@@ -2,14 +2,14 @@ import React from "react";
 import { auth } from "@/auth";
 import { flagsApi, segmentsApi } from "@/lib/api";
 import FlagsList from "./flags-list";
-import type { Flag } from "@/types";
+import type { Flag, Segment } from "@/types";
 
 export default async function FlagsPage() {
   const session = await auth();
   const token = session?.user ? (session.user as any).token : undefined;
 
   let flags: Flag[] = [];
-  let segmentsCount = 0;
+  let segments: Segment[] = [];
 
   const fallbackFlags: Flag[] = [
     {
@@ -53,15 +53,18 @@ export default async function FlagsPage() {
     }
 
     try {
-      const segments = await segmentsApi.getAll(token);
-      segmentsCount = segments.length;
+      segments = await segmentsApi.getAll(token);
     } catch (err) {
       console.warn("Could not load segments for flags page stats:", err);
     }
   } else {
     flags = fallbackFlags;
-    segmentsCount = 5; // fallback matching segments placeholder count
+    // Fallback segments
+    segments = [
+      { segmentId: "s1", name: "Beta Testers", description: "Users in beta plan", rules: [], createdAt: new Date().toISOString() },
+      { segmentId: "s2", name: "Enterprise Accounts", description: "Premium tier clients", rules: [], createdAt: new Date().toISOString() }
+    ];
   }
 
-  return <FlagsList initialFlags={flags} token={token} segmentsCount={segmentsCount} />;
+  return <FlagsList initialFlags={flags} token={token} initialSegments={segments} />;
 }
